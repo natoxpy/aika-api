@@ -90,7 +90,7 @@ impl Tables for SqliteTables {
     fn file(
         &self,
     ) -> Box<&dyn super::Table<Item = super::content::File, Database = Self::Database>> {
-        todo!()
+        Box::new(&self.file_table)
     }
 }
 

@@ -127,7 +127,7 @@ impl<Q: ToString + Send + 'static> TableFetchWhereMusic<Q> for MusicImageTable {
         music: Music,
     ) -> Pin<Box<dyn Future<Output = Option<Self::ItemWhereMusic>> + Send>> {
         let pool = self.pool.clone();
-        let query = "SELECT * FROM music_images where music = $1;";
+        let query = "SELECT * FROM music_images WHERE music = $1;";
         let music_id = music.id.to_string();
 
         Box::pin(async move {
@@ -149,7 +149,7 @@ impl<Q: ToString + Send + 'static> TableFetchWhereMusic<Q> for MusicImageTable {
         id: Q,
     ) -> Pin<Box<dyn Future<Output = Option<Self::ItemWhereMusic>> + Send>> {
         let pool = self.pool.clone();
-        let query = "SELECT * FROM music_images where music = $1;";
+        let query = "SELECT * FROM music_images WHERE music = $1;";
 
         Box::pin(async move {
             if let Ok(item) = sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereMusic>(query)

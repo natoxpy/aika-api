@@ -17,7 +17,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for FileTable
         id: Q,
     ) -> Pin<Box<dyn Future<Output = Option<Self::Item>> + Send>> {
         let pool = self.pool.clone();
-        let query = "SELECT * FROM files where id = $1;";
+        let query = "SELECT * FROM files WHERE id = $1;";
 
         Box::pin(async move {
             if let Ok(item) = sqlx::query_as::<Self::Database, Self::Item>(query)
@@ -37,7 +37,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for FileTable
         id: Q,
     ) -> Pin<Box<dyn Future<Output = Vec<Self::Item>> + Send>> {
         let pool = self.pool.clone();
-        let query = "SELECT * FROM files where id = $1;";
+        let query = "SELECT * FROM files WHERE id = $1;";
 
         Box::pin(async move {
             sqlx::query_as::<Self::Database, Self::Item>(query)
