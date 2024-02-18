@@ -15,6 +15,7 @@ where
     R: Row,
     &'r str: ColumnIndex<R>,
     String: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
+    i64: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
 {
     type Item = Image;
     type Database = Sqlite;
@@ -69,7 +70,7 @@ where
 
     fn save(&self, image: Self::Item) -> Pin<Box<dyn Future<Output = ()> + Send>> {
         let pool = self.pool.clone();
-        let query = "INSERT INTO images (id, name) VALUES (?, ?);";
+        let query = "INSERT INTO images (id, file) VALUES (?, ?);";
 
         Box::pin(async move {
             sqlx::query::<Self::Database>(query)

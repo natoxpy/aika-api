@@ -12,6 +12,7 @@ where
     R: Row,
     &'r str: ColumnIndex<R>,
     String: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
+    i64: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
 {
     type Item: sqlx::FromRow<'r, R>;
     type Database;
