@@ -1271,6 +1271,7 @@ dependencies = [
  "actix-web",
  "mime",
  "nyaadl",
+ "paste",
  "reqwest",
  "sclouddl",
  "serde",

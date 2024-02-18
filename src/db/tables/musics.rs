@@ -69,7 +69,6 @@ impl MusicTable {
 
     pub async fn all(&self) -> Vec<Music> {
         let query = "SELECT * FROM musics;";
-
         sqlx::query_as::<_, Music>(query)
             .fetch_all(&self.pool)
             .await
