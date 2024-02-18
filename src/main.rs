@@ -4,17 +4,16 @@ use actix_cors::Cors;
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use music_manager::{
     routes::{cdn, dbr, nyaa, soundcloud, youtube},
-    states::{DBState, DB, FILES},
+    states::{DB, FILES},
 };
 use sqlx::sqlite::SqlitePoolOptions;
 use std::env;
 
 #[get("/")]
-async fn hello_world(db: web::Data<DBState>) -> impl Responder {
-    let table = &db.music_table;
-    // table.save(Music::new("from a world of love")).await;
-    table.all().await;
+async fn hello_world(db: web::Data<DB>) -> impl Responder {
+    let table = &db.tables.music();
 
+    table.get_all().await;
     HttpResponse::Ok().body("Hello world")
 }
 
