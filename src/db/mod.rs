@@ -3,29 +3,32 @@ pub mod sqlite;
 pub mod tables;
 
 use paste::paste;
-use sqlx::{ColumnIndex, Row};
 use std::{future::Future, pin::Pin};
 
+use self::content::{Artist, Audio, File, Image, Music};
+
+pub trait Tables {
+    type Database: sqlx::Database;
+
+    fn new(pool: sqlx::Pool<Self::Database>) -> Box<dyn Tables<Database = Self::Database>>
+    where
+        Self: Sized;
+
+    fn music(&self) -> Box<&dyn Table<Item = Music, Database = Self::Database>>;
+    fn image(&self) -> Box<&dyn Table<Item = Image, Database = Self::Database>>;
+    fn artists(&self) -> Box<&dyn Table<Item = Artist, Database = Self::Database>>;
+    fn audio(&self) -> Box<&dyn Table<Item = Audio, Database = Self::Database>>;
+    fn file(&self) -> Box<&dyn Table<Item = File, Database = Self::Database>>;
+}
+
 /// Table which implements all generic fetching methods using the ID and generic save methods
-pub trait Table<'r, R>
-where
-    R: Row,
-    &'r str: ColumnIndex<R>,
-    String: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
-    i64: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
-{
-    type Item: sqlx::FromRow<'r, R>;
-    type Database;
+pub trait Table<Q: ToString + Send + 'static = String> {
+    type Item;
+    type Database: sqlx::Database;
 
-    fn get<Q: ToString + Send + 'static>(
-        &self,
-        id: Q,
-    ) -> Pin<Box<dyn Future<Output = Option<Self::Item>> + Send>>;
+    fn get(&self, id: Q) -> Pin<Box<dyn Future<Output = Option<Self::Item>> + Send>>;
 
-    fn get_many<Q: ToString + Send + 'static>(
-        &self,
-        id: Q,
-    ) -> Pin<Box<dyn Future<Output = Vec<Self::Item>> + Send>>;
+    fn get_many(&self, id: Q) -> Pin<Box<dyn Future<Output = Vec<Self::Item>> + Send>>;
 
     fn get_all(&self) -> Pin<Box<dyn Future<Output = Vec<Self::Item>> + Send>>;
 

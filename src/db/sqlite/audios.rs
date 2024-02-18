@@ -1,4 +1,4 @@
-use sqlx::{ColumnIndex, Pool, Row, Sqlite};
+use sqlx::{Pool, Sqlite};
 use std::{future::Future, pin::Pin};
 
 use crate::db::{content::Audio, Table};
@@ -7,17 +7,12 @@ pub struct AudioTable {
     pub pool: Pool<Sqlite>,
 }
 
-impl<'r, R> Table<'r, R> for AudioTable
-where
-    R: Row,
-    &'r str: ColumnIndex<R>,
-    String: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
-    i64: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
+impl<Q: ToString + Send + 'static> Table<Q> for AudioTable
 {
     type Item = Audio;
     type Database = Sqlite;
 
-    fn get<Q: ToString + Send + 'static>(
+    fn get(
         &self,
         id: Q,
     ) -> Pin<Box<dyn Future<Output = Option<Self::Item>> + Send>> {
@@ -37,7 +32,7 @@ where
         })
     }
 
-    fn get_many<Q: ToString + Send + 'static>(
+    fn get_many(
         &self,
         id: Q,
     ) -> Pin<Box<dyn Future<Output = Vec<Self::Item>> + Send>> {

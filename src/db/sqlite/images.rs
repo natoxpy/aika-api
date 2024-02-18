@@ -1,29 +1,17 @@
-use sqlx::{ColumnIndex, Pool, Row, Sqlite};
+use sqlx::{Pool, Sqlite};
 use std::{future::Future, pin::Pin};
 
-use crate::db::{
-    content::Image,
-    Table,
-};
+use crate::db::{content::Image, Table};
 
 pub struct ImageTable {
     pub pool: Pool<Sqlite>,
 }
 
-impl<'r, R> Table<'r, R> for ImageTable
-where
-    R: Row,
-    &'r str: ColumnIndex<R>,
-    String: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
-    i64: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
-{
+impl<Q: ToString + Send + 'static> Table<Q> for ImageTable {
     type Item = Image;
     type Database = Sqlite;
 
-    fn get<Q: ToString + Send + 'static>(
-        &self,
-        id: Q,
-    ) -> Pin<Box<dyn Future<Output = Option<Self::Item>> + Send>> {
+    fn get(&self, id: Q) -> Pin<Box<dyn Future<Output = Option<Self::Item>> + Send>> {
         let pool = self.pool.clone();
         let query = "SELECT * FROM images where id = $1;";
 
@@ -40,10 +28,7 @@ where
         })
     }
 
-    fn get_many<Q: ToString + Send + 'static>(
-        &self,
-        id: Q,
-    ) -> Pin<Box<dyn Future<Output = Vec<Self::Item>> + Send>> {
+    fn get_many(&self, id: Q) -> Pin<Box<dyn Future<Output = Vec<Self::Item>> + Send>> {
         let pool = self.pool.clone();
         let query = "SELECT * FROM images where id = $1;";
 
