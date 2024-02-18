@@ -49,3 +49,22 @@ where
 }
 
 
+impl<'r, R> sqlx::FromRow<'r, R> for Image
+where
+    R: Row,
+    &'r str: ColumnIndex<R>,
+    String: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
+{
+    #[inline]
+    fn from_row(row: &'r R) -> Result<Self, sqlx::Error> {
+        let id: String = row.try_get("id")?;
+        let file: String = row.try_get("file")?;
+
+        Ok(Self {
+            file: Uuid::parse_str(&file).unwrap(),
+            id: Uuid::parse_str(&id).unwrap(),
+        })
+    }
+}
+
+

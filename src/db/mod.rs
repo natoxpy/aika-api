@@ -3,11 +3,18 @@ pub mod sqlite;
 pub mod tables;
 
 use paste::paste;
+use sqlx::{ColumnIndex, Row};
 use std::{future::Future, pin::Pin};
 
 /// Table which implements all generic fetching methods using the ID and generic save methods
-pub trait Table {
-    type Item;
+pub trait Table<'r, R>
+where
+    R: Row,
+    &'r str: ColumnIndex<R>,
+    String: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
+{
+    type Item: sqlx::FromRow<'r, R>;
+    type Database;
 
     fn get<Q: ToString + Send + 'static>(
         &self,

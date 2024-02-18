@@ -1,20 +1,22 @@
+use sqlx::{ColumnIndex, Pool, Row, Sqlite};
 use std::{future::Future, pin::Pin};
 
-use sqlx::{ColumnIndex, Pool, Row, Sqlite};
+use crate::db::{
+    content::Image,
+    Table,
+};
 
-use crate::db::{content::Music, Table};
-
-pub struct MusicTable {
+pub struct ImageTable {
     pub pool: Pool<Sqlite>,
 }
 
-impl<'r, R> Table<'r, R> for MusicTable
+impl<'r, R> Table<'r, R> for ImageTable
 where
     R: Row,
     &'r str: ColumnIndex<R>,
     String: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
 {
-    type Item = Music;
+    type Item = Image;
     type Database = Sqlite;
 
     fn get<Q: ToString + Send + 'static>(
@@ -22,10 +24,10 @@ where
         id: Q,
     ) -> Pin<Box<dyn Future<Output = Option<Self::Item>> + Send>> {
         let pool = self.pool.clone();
-        let query = "SELECT * FROM musics where id = $1;";
+        let query = "SELECT * FROM images where id = $1;";
 
         Box::pin(async move {
-            if let Ok(music) = sqlx::query_as::<Self::Database, Self::Item>(query)
+            if let Ok(music) = sqlx::query_as::<Self::Database, Image>(query)
                 .bind(id.to_string())
                 .fetch_one(&pool)
                 .await
@@ -42,7 +44,7 @@ where
         id: Q,
     ) -> Pin<Box<dyn Future<Output = Vec<Self::Item>> + Send>> {
         let pool = self.pool.clone();
-        let query = "SELECT * FROM musics where id = $1;";
+        let query = "SELECT * FROM images where id = $1;";
 
         Box::pin(async move {
             sqlx::query_as::<Self::Database, Self::Item>(query)
@@ -55,7 +57,7 @@ where
 
     fn get_all(&self) -> Pin<Box<dyn Future<Output = Vec<Self::Item>> + Send>> {
         let pool = self.pool.clone();
-        let query = "SELECT * FROM musics;";
+        let query = "SELECT * FROM images;";
 
         Box::pin(async move {
             sqlx::query_as::<Self::Database, Self::Item>(query)
@@ -65,14 +67,14 @@ where
         })
     }
 
-    fn save(&self, music: Self::Item) -> Pin<Box<dyn Future<Output = ()> + Send>> {
+    fn save(&self, image: Self::Item) -> Pin<Box<dyn Future<Output = ()> + Send>> {
         let pool = self.pool.clone();
-        let query = "INSERT INTO musics (id, name) VALUES (?, ?);";
+        let query = "INSERT INTO images (id, name) VALUES (?, ?);";
 
         Box::pin(async move {
             sqlx::query::<Self::Database>(query)
-                .bind(music.id.to_string())
-                .bind(music.name)
+                .bind(image.id.to_string())
+                .bind(image.file.to_string())
                 .execute(&pool)
                 .await
                 .unwrap();
