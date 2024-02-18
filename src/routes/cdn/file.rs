@@ -2,13 +2,13 @@ use std::{fs, path::PathBuf};
 
 use actix_web::{get, http::header, web, HttpResponse, Responder};
 
-use crate::states::{DBState, FILES};
+use crate::states::{DB, FILES};
 
 #[get("/{file_id}")]
-async fn file_cdn(db: web::Data<DBState>, path: web::Path<String>) -> impl Responder {
+async fn file_cdn(db: web::Data<DB>, path: web::Path<String>) -> impl Responder {
     let file_id: String = path.into_inner();
 
-    let file_opt = db.file_table.get(file_id.clone()).await;
+    let file_opt = db.tables.file().get(file_id.clone()).await;
 
     if file_opt.is_none() {
         return HttpResponse::NoContent().into();

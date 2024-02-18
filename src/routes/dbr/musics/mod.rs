@@ -2,10 +2,10 @@ pub mod music;
 
 use actix_web::{get, web, Responder, Scope};
 
-use crate::states::DBState;
+use crate::states::DB;
 
 #[get("/")]
-pub async fn get_musics(db: web::Data<DBState>) -> impl Responder {
+pub async fn get_musics(db: web::Data<DB>) -> impl Responder {
     // for music in db.music_table.all().await {
     //     let image_refs = db.music_image_table.get_by_music(&music).await;
     //     for image_ref in image_refs {
@@ -23,7 +23,7 @@ pub async fn get_musics(db: web::Data<DBState>) -> impl Responder {
     //     }
     // }
 
-    serde_json::to_string(&db.music_table.all().await)
+    serde_json::to_string(&db.tables.music().get_all().await)
 }
 
 pub fn scope() -> Scope {
