@@ -9,6 +9,11 @@ struct ArtistData {
     name: String,
 }
 
+#[get("/")]
+pub async fn fetch(db: web::Data<DB>) -> impl Responder {
+    HttpResponse::Ok().json(db.tables.artists().get_all().await)
+}
+
 #[post("/")]
 pub async fn create(db: web::Data<DB>, data: web::Json<ArtistData>) -> impl Responder {
     let artist_data = data.into_inner();
@@ -28,14 +33,18 @@ pub async fn read(db: web::Data<DB>, path: web::Path<Uuid>) -> impl Responder {
     let id = path.into_inner();
 
     if let Some(artist) = db.tables.artists().get(id.to_string()).await {
-        return HttpResponse::Ok().json(artist)
+        return HttpResponse::Ok().json(artist);
     }
 
     HttpResponse::NotFound().into()
 }
 
 #[patch("/{id}")]
-pub async fn update(_db: web::Data<DB>, _path: web::Path<Uuid>, _data: web::Json<ArtistData>) -> impl Responder {
+pub async fn update(
+    _db: web::Data<DB>,
+    _path: web::Path<Uuid>,
+    _data: web::Json<ArtistData>,
+) -> impl Responder {
     todo!("implement patch HTTP method to artists");
     #[allow(unreachable_code)]
     ""
@@ -50,6 +59,7 @@ pub async fn delete(_db: web::Data<DB>, _path: web::Path<Uuid>) -> impl Responde
 
 pub fn scope() -> Scope {
     web::scope("/artists")
+        .service(fetch)
         .service(create)
         .service(read)
         .service(update)

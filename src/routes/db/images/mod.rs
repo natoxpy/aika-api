@@ -9,6 +9,11 @@ struct ImageData {
     file: Uuid,
 }
 
+#[get("/")]
+pub async fn fetch(db: web::Data<DB>) -> impl Responder {
+    HttpResponse::Ok().json(db.tables.image().get_all().await)
+}
+
 #[post("/")]
 pub async fn create(db: web::Data<DB>, data: web::Json<ImageData>) -> impl Responder {
     let image_data = data.into_inner();
@@ -54,6 +59,7 @@ pub async fn delete(_db: web::Data<DB>, _path: web::Path<Uuid>) -> impl Responde
 
 pub fn scope() -> Scope {
     web::scope("/images")
+        .service(fetch)
         .service(create)
         .service(read)
         .service(update)

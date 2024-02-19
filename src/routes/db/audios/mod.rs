@@ -9,6 +9,11 @@ struct AudioData {
     file: Uuid,
 }
 
+#[get("/")]
+pub async fn fetch(db: web::Data<DB>) -> impl Responder {
+    HttpResponse::Ok().json(db.tables.audio().get_all().await)
+}
+
 #[post("/")]
 pub async fn create(db: web::Data<DB>, data: web::Json<AudioData>) -> impl Responder {
     let audio_data = data.into_inner();
@@ -50,6 +55,7 @@ pub async fn delete(_db: web::Data<DB>, _path: web::Path<Uuid>) -> impl Responde
 
 pub fn scope() -> Scope {
     web::scope("/audios")
+        .service(fetch)
         .service(create)
         .service(read)
         .service(update)
