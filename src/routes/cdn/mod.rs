@@ -1,5 +1,4 @@
 pub mod file;
-pub mod get_file;
 
 use actix_web::{web, Scope};
 

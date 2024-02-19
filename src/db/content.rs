@@ -9,19 +9,19 @@ pub struct Music {
     pub name: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Image {
     pub file: Uuid,
     pub id: Uuid,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Artist {
     pub id: Uuid,
     pub name: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Album {
     pub id: Uuid,
     pub name: String,
@@ -29,13 +29,13 @@ pub struct Album {
     pub released: Option<chrono::DateTime<Utc>>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Audio {
     pub id: Uuid,
     pub file: Uuid,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct File {
     pub id: Uuid,
     pub name: String,

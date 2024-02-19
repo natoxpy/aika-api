@@ -3,7 +3,8 @@ extern crate music_manager;
 use actix_cors::Cors;
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use music_manager::{
-    routes::{cdn, dbr, nyaa, soundcloud, youtube},
+    routes,
+    // routes::{cdn, dbr, nyaa, soundcloud, youtube},
     states::{DB, FILES},
 };
 use sqlx::sqlite::SqlitePoolOptions;
@@ -39,11 +40,12 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(cors)
             .app_data(db.clone())
-            .service(dbr::scope())
-            .service(cdn::scope())
-            .service(soundcloud::scope())
-            .service(nyaa::scope())
-            .service(youtube::scope())
+            .service(routes::db::scope())
+            .service(routes::cdn::scope())
+            .service(routes::fs::scope())
+            .service(routes::soundcloud::scope())
+            .service(routes::nyaa::scope())
+            .service(routes::youtube::scope())
             .service(hello_world)
     })
     .bind(("::1", 8000))?

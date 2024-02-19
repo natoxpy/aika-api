@@ -14,15 +14,17 @@ async fn file_cdn(db: web::Data<DB>, path: web::Path<String>) -> impl Responder 
         return HttpResponse::NoContent().into();
     }
 
-    let file = file_opt.unwrap();
+    let file_db = file_opt.unwrap();
 
-    let path = PathBuf::from(format!("{}{}", FILES, file.location));
+    let path = PathBuf::from(format!("{}{}", FILES, file_db.location));
 
     let file = fs::read(path).unwrap();
 
     let mut response = HttpResponse::Ok();
 
-    response.insert_header(("Content-Type", mime::MPEG.to_string()));
+    let mime: mime::Mime = file_db.mime.parse().unwrap();
+
+    response.insert_header(("Content-Type", mime.to_string()));
     response.insert_header(header::ContentLength(file.len()));
     response.insert_header((header::TRANSFER_ENCODING, "chunked"));
 
