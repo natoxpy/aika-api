@@ -1,6 +1,6 @@
 pub mod music;
 
-use actix_web::{get, web, Responder, Scope};
+use actix_web::{get, web, Responder, Scope, HttpResponse};
 
 use crate::states::DB;
 
@@ -23,7 +23,7 @@ pub async fn get_musics(db: web::Data<DB>) -> impl Responder {
     //     }
     // }
 
-    serde_json::to_string(&db.tables.music().get_all().await)
+    HttpResponse::Ok().json(db.tables.music().get_all().await)
 }
 
 pub fn scope() -> Scope {

@@ -8,5 +8,4 @@ pub fn scope() -> Scope {
     web::scope("/soundcloud")
         .service(import::import)
         .service(preview::metadata)
-        // .service(download::download_scloud)
 }

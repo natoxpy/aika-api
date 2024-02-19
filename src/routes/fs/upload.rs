@@ -1,5 +1,5 @@
 use crate::db::content;
-use actix_web::{get, web, Responder};
+use actix_web::{get, web, Responder, HttpResponse};
 use std::{fs, io::Write, path::PathBuf};
 use uuid::Uuid;
 
@@ -30,5 +30,5 @@ async fn upload_from_url(db: web::Data<DB>, file_url: web::Path<String>) -> impl
 
     db.tables.file().save(file_record.clone()).await;
 
-    serde_json::to_string(&file_record)
+    HttpResponse::Ok().json(file_record)
 }

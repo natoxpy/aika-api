@@ -53,5 +53,5 @@ async fn import(data: web::Json<ImportData>, db: web::Data<DB>) -> impl Responde
     db.tables.music().save(music.clone());
     db.tables.refs().music_image().save(music_cover);
 
-    HttpResponse::Ok().body(serde_json::to_string(&music).unwrap())
+    HttpResponse::Ok().json(music)
 }

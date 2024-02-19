@@ -20,7 +20,7 @@ pub async fn create(db: web::Data<DB>, data: web::Json<ImageData>) -> impl Respo
 
     db.tables.image().save(image.clone()).await;
 
-    HttpResponse::Ok().body(serde_json::to_string(&image).unwrap())
+    HttpResponse::Ok().json(image)
 }
 
 #[get("/{id}")]
@@ -28,14 +28,18 @@ pub async fn read(db: web::Data<DB>, path: web::Path<Uuid>) -> impl Responder {
     let id = path.into_inner();
 
     if let Some(image) = db.tables.image().get(id.to_string()).await {
-        return HttpResponse::Ok().body(serde_json::to_string(&image).unwrap())
+        return HttpResponse::Ok().json(image);
     }
 
     HttpResponse::NotFound().into()
 }
 
 #[patch("/{id}")]
-pub async fn update(_db: web::Data<DB>, _path: web::Path<Uuid>, _data: web::Json<ImageData>) -> impl Responder {
+pub async fn update(
+    _db: web::Data<DB>,
+    _path: web::Path<Uuid>,
+    _data: web::Json<ImageData>,
+) -> impl Responder {
     todo!("implement patch HTTP method to images");
     #[allow(unreachable_code)]
     ""

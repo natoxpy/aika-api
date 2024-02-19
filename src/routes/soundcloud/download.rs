@@ -1,4 +1,4 @@
-use actix_web::{get, web, Responder};
+use actix_web::{get, web, Responder, HttpResponse};
 use sclouddl::{track::Track, utils::gen_key};
 use serde::{Deserialize, Serialize};
 
@@ -35,5 +35,5 @@ async fn get_progressive_stream(spath: web::Path<String>) -> impl Responder {
         track
     };
 
-    serde_json::to_string(&res)
+    HttpResponse::Ok().json(res)
 }

@@ -20,7 +20,7 @@ pub async fn create(db: web::Data<DB>, data: web::Json<AudioData>) -> impl Respo
 
     db.tables.audio().save(audio.clone()).await;
 
-    HttpResponse::Ok().body(serde_json::to_string(&audio).unwrap())
+    HttpResponse::Ok().json(audio)
 }
 
 #[get("/{id}")]
@@ -28,7 +28,7 @@ pub async fn read(db: web::Data<DB>, path: web::Path<Uuid>) -> impl Responder {
     let id = path.into_inner();
 
     if let Some(audio) = db.tables.audio().get(id.to_string()).await {
-        return HttpResponse::Ok().body(serde_json::to_string(&audio).unwrap())
+        return HttpResponse::Ok().json(audio)
     }
 
     HttpResponse::NotFound().into()
