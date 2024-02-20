@@ -1,3 +1,5 @@
+pub mod artist;
+
 use actix_web::{delete, get, patch, post, web, HttpResponse, Responder, Scope};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -21,6 +23,7 @@ pub async fn create(db: web::Data<DB>, data: web::Json<ArtistData>) -> impl Resp
     let artist = Artist {
         id: Uuid::new_v4(),
         name: artist_data.name,
+        avatar: None,
     };
 
     db.tables.artists().save(artist.clone()).await;
@@ -64,4 +67,5 @@ pub fn scope() -> Scope {
         .service(read)
         .service(update)
         .service(delete)
+        .service(artist::scope())
 }

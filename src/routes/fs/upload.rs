@@ -1,11 +1,11 @@
 use crate::db::content;
-use actix_web::{get, web, Responder, HttpResponse};
+use actix_web::{web, Responder, HttpResponse, post};
 use std::{fs, io::Write, path::PathBuf};
 use uuid::Uuid;
 
 use crate::states::{DB, FILES};
 
-#[get("/upload/{file_url}")]
+#[post("/upload/{file_url}")]
 async fn upload_from_url(db: web::Data<DB>, file_url: web::Path<String>) -> impl Responder {
     let response = reqwest::get(file_url.into_inner()).await.unwrap();
     let body = response.bytes().await.unwrap();

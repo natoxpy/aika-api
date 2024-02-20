@@ -19,6 +19,7 @@ pub struct Image {
 pub struct Artist {
     pub id: Uuid,
     pub name: String,
+    pub avatar: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -92,10 +93,12 @@ where
     fn from_row(row: &'r R) -> Result<Self, sqlx::Error> {
         let id: String = row.try_get("id")?;
         let name: String = row.try_get("name")?;
+        let avatar: Option<String> = row.try_get("avatar")?;
 
         Ok(Self {
-            id: Uuid::parse_str(&id).unwrap(),
             name,
+            avatar,
+            id: Uuid::parse_str(&id).unwrap(),
         })
     }
 }
