@@ -12,7 +12,7 @@ nyaadl = { path = "/home/natoxpy/projects/msp/aika/dls/nyaadl" }
 
 actix-web = "4"
 mime = "0.3.17"
-sqlx = { version = "0.7", features = [ "runtime-tokio", "sqlite" ] }
+sqlx = { version = "0.7", features = [ "runtime-tokio", "sqlite", "uuid" ] }
 uuid = { version = "1.6.1", features = ["v4", "serde"] }
 reqwest = { version = "0.11.24", features = [ "blocking" ] } 
 serde = { version = "1.0.196", features = ["derive"] }

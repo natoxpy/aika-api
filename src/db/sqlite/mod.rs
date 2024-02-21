@@ -1,4 +1,5 @@
 use self::{
+    albums::AlbumTable,
     artists::ArtistTable,
     audios::AudioTable,
     files::FileTable,
@@ -34,6 +35,7 @@ pub struct SqliteTables {
     pub artist_table: ArtistTable,
     pub audio_table: AudioTable,
     pub file_table: FileTable,
+    pub album_table: AlbumTable,
     pub ref_tables: SqliteRefTables,
 }
 
@@ -63,6 +65,7 @@ impl Tables for SqliteTables {
             artist_table: ArtistTable { pool: pool.clone() },
             audio_table: AudioTable { pool: pool.clone() },
             file_table: FileTable { pool: pool.clone() },
+            album_table: AlbumTable { pool: pool.clone() },
             ref_tables,
         })
     }
@@ -95,6 +98,12 @@ impl Tables for SqliteTables {
         &self,
     ) -> Box<&dyn super::Table<Item = super::content::File, Database = Self::Database>> {
         Box::new(&self.file_table)
+    }
+
+    fn albums(
+        &self,
+    ) -> Box<&dyn super::Table<Item = super::content::Album, Database = Self::Database>> {
+        Box::new(&self.album_table)
     }
 }
 

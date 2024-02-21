@@ -1,3 +1,4 @@
+mod albums;
 mod artists;
 mod audios;
 mod images;
@@ -10,4 +11,5 @@ pub fn scope() -> Scope {
         .service(images::scope())
         .service(artists::scope())
         .service(audios::scope())
+        .service(albums::scope())
 }

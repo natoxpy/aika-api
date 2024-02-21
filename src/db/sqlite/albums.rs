@@ -55,13 +55,13 @@ impl<Q: ToString + Send + 'static> Table<Q> for AlbumTable {
 
     fn save(&self, item: Self::Item) -> Pin<Box<dyn Future<Output = ()> + Send>> {
         let pool = self.pool.clone();
-        let query = "INSERT INTO albums (id, name, cover) VALUES (?, ?);";
+        let query = "INSERT INTO albums (id, name) VALUES (?, ?);";
 
         Box::pin(async move {
             sqlx::query::<Self::Database>(query)
                 .bind(item.id.to_string())
                 .bind(item.name.to_string())
-                .bind(item.cover.to_string())
+                // .bind(item.cover)
                 // TODO!() implemente release date
                 .execute(&pool)
                 .await

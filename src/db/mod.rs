@@ -77,6 +77,7 @@ pub trait Tables {
         Self: Sized;
 
     fn musics(&self) -> Box<&dyn Table<Item = Music, Database = Self::Database>>;
+    fn albums(&self) -> Box<&dyn Table<Item = Album, Database = Self::Database>>;
     fn images(&self) -> Box<&dyn Table<Item = Image, Database = Self::Database>>;
     fn artists(&self) -> Box<&dyn Table<Item = Artist, Database = Self::Database>>;
     fn audios(&self) -> Box<&dyn Table<Item = Audio, Database = Self::Database>>;

@@ -26,7 +26,7 @@ pub struct Artist {
 pub struct Album {
     pub id: Uuid,
     pub name: String,
-    pub cover: Uuid,
+    pub cover: Option<Uuid>,
     pub released: Option<chrono::DateTime<Utc>>,
 }
 
@@ -152,19 +152,20 @@ where
     &'r str: ColumnIndex<R>,
     String: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
     i64: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
+    Uuid: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
 {
     fn from_row(row: &'r R) -> Result<Self, sqlx::Error> {
-        let id: String = row.try_get("id")?;
+        let id: Uuid = row.try_get("id")?;
         let name: String = row.try_get("name")?;
-        let cover: String = row.try_get("cover")?;
+        let cover: Option<Uuid> = row.try_get("cover")?;
 
         // TODO: Implemented release date for cover
         // let released: String = row.try_get("released")?;
 
         Ok(Self {
-            id: Uuid::parse_str(&id).unwrap(),
+            id,
             name,
-            cover: Uuid::parse_str(&cover).unwrap(),
+            cover,
             released: None,
         })
     }
