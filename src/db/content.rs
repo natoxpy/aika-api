@@ -152,20 +152,22 @@ where
     &'r str: ColumnIndex<R>,
     String: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
     i64: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
-    Uuid: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
+    // FIXME: Uuid could not be read correctly, possibly reimplement later
+    // Uuid: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
 {
     fn from_row(row: &'r R) -> Result<Self, sqlx::Error> {
-        let id: Uuid = row.try_get("id")?;
+        let id: String = row.try_get("id")?;
         let name: String = row.try_get("name")?;
-        let cover: Option<Uuid> = row.try_get("cover")?;
+        // TODO: Implement cover
+        // let cover: Option<Uuid> = row.try_get("cover")?;
 
         // TODO: Implemented release date for cover
         // let released: String = row.try_get("released")?;
 
         Ok(Self {
-            id,
+            id: Uuid::parse_str(&id).unwrap(),
             name,
-            cover,
+            cover: None,
             released: None,
         })
     }
