@@ -6,12 +6,34 @@ use paste::paste;
 use std::{future::Future, pin::Pin};
 
 use self::{
-    content::{Artist, Audio, File, Image, Music},
-    content_refs::{MusicArtistRef, MusicAudioRef, MusicImageRef},
+    content::{Album, Artist, Audio, File, Image, Music},
+    content_refs::{AlbumArtistRef, MusicAlbumRef, MusicArtistRef, MusicAudioRef, MusicImageRef},
 };
 
 pub trait RefTables {
     type Database: sqlx::Database;
+
+    fn album_artist(
+        &self,
+    ) -> Box<
+        &dyn TableAlbumArtistRef<
+            Item = AlbumArtistRef,
+            ItemWhereAlbum = AlbumArtistRef,
+            ItemWhereArtist = AlbumArtistRef,
+            Database = Self::Database,
+        >,
+    >;
+
+    fn music_album(
+        &self,
+    ) -> Box<
+        &dyn TableMusicAlbumRef<
+            Item = MusicAlbumRef,
+            ItemWhereMusic = MusicAlbumRef,
+            ItemWhereAlbum = MusicAlbumRef,
+            Database = Self::Database,
+        >,
+    >;
 
     fn music_artist(
         &self,
@@ -96,7 +118,10 @@ TableSearchFor!(Music);
 TableSearchFor!(Image);
 TableSearchFor!(Audio);
 TableSearchFor!(Artist);
+TableSearchFor!(Album);
 
 pub trait TableMusicArtistRef: Table + TableFetchWhereMusic + TableFetchWhereArtist {}
 pub trait TableMusicImageRef: Table + TableFetchWhereMusic + TableFetchWhereImage {}
 pub trait TableMusicAudioRef: Table + TableFetchWhereMusic + TableFetchWhereAudio {}
+pub trait TableMusicAlbumRef: Table + TableFetchWhereMusic + TableFetchWhereAlbum {}
+pub trait TableAlbumArtistRef: Table + TableFetchWhereArtist + TableFetchWhereAlbum {}

@@ -2,6 +2,20 @@ use sqlx::{ColumnIndex, Row};
 use uuid::Uuid;
 
 #[derive(Debug, Clone)]
+pub struct AlbumArtistRef {
+    pub id: Uuid,
+    pub artist: Uuid,
+    pub album: Uuid,
+}
+
+#[derive(Debug, Clone)]
+pub struct MusicAlbumRef {
+    pub id: Uuid,
+    pub music: Uuid,
+    pub album: Uuid,
+}
+
+#[derive(Debug, Clone)]
 pub struct MusicArtistRef {
     pub id: Uuid,
     pub music: Uuid,
@@ -77,6 +91,46 @@ where
             id: Uuid::parse_str(&id).unwrap(),
             music: Uuid::parse_str(&music).unwrap(),
             image: Uuid::parse_str(&image).unwrap(),
+        })
+    }
+}
+
+impl<'r, R> sqlx::FromRow<'r, R> for MusicAlbumRef
+where
+    R: Row,
+    &'r str: ColumnIndex<R>,
+    String: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
+    i64: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
+{
+    fn from_row(row: &'r R) -> Result<Self, sqlx::Error> {
+        let id: String = row.try_get("id")?;
+        let music: String = row.try_get("music")?;
+        let album: String = row.try_get("album")?;
+
+        Ok(Self {
+            id: Uuid::parse_str(&id).unwrap(),
+            music: Uuid::parse_str(&music).unwrap(),
+            album: Uuid::parse_str(&album).unwrap(),
+        })
+    }
+}
+
+impl<'r, R> sqlx::FromRow<'r, R> for AlbumArtistRef
+where
+    R: Row,
+    &'r str: ColumnIndex<R>,
+    String: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
+    i64: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
+{
+    fn from_row(row: &'r R) -> Result<Self, sqlx::Error> {
+        let id: String = row.try_get("id")?;
+        let artist: String = row.try_get("artist")?;
+        let album: String = row.try_get("album")?;
+
+        Ok(Self {
+            id: Uuid::parse_str(&id).unwrap(),
+            artist: Uuid::parse_str(&artist).unwrap(),
+            album: Uuid::parse_str(&album).unwrap(),
         })
     }
 }

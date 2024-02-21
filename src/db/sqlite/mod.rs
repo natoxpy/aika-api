@@ -5,6 +5,7 @@ use self::{
     images::ImageTable,
     musics::MusicTable,
     refs::{
+        album_artists::AlbumArtistTable, music_albums::MusicAlbumTable,
         music_artist::MusicArtistTable, music_audio::MusicAudioTable, music_image::MusicImageTable,
     },
 };
@@ -22,6 +23,8 @@ pub struct SqliteRefTables {
     pub music_artist_table: MusicArtistTable,
     pub music_audio_table: MusicAudioTable,
     pub music_image_table: MusicImageTable,
+    pub music_album_table: MusicAlbumTable,
+    pub album_artist_table: AlbumArtistTable,
 }
 
 pub struct SqliteTables {
@@ -49,6 +52,8 @@ impl Tables for SqliteTables {
             music_artist_table: MusicArtistTable { pool: pool.clone() },
             music_image_table: MusicImageTable { pool: pool.clone() },
             music_audio_table: MusicAudioTable { pool: pool.clone() },
+            music_album_table: MusicAlbumTable { pool: pool.clone() },
+            album_artist_table: AlbumArtistTable { pool: pool.clone() },
         };
 
         Box::new(Self {
@@ -133,5 +138,31 @@ impl RefTables for SqliteRefTables {
         >,
     > {
         Box::new(&self.music_audio_table)
+    }
+
+    fn album_artist(
+        &self,
+    ) -> Box<
+        &dyn super::TableAlbumArtistRef<
+            Item = super::content_refs::AlbumArtistRef,
+            ItemWhereAlbum = super::content_refs::AlbumArtistRef,
+            ItemWhereArtist = super::content_refs::AlbumArtistRef,
+            Database = Self::Database,
+        >,
+    > {
+        Box::new(&self.album_artist_table)
+    }
+
+    fn music_album(
+        &self,
+    ) -> Box<
+        &dyn super::TableMusicAlbumRef<
+            Item = super::content_refs::MusicAlbumRef,
+            ItemWhereMusic = super::content_refs::MusicAlbumRef,
+            ItemWhereAlbum = super::content_refs::MusicAlbumRef,
+            Database = Self::Database,
+        >,
+    > {
+        Box::new(&self.music_album_table)
     }
 }
