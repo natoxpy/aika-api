@@ -5,8 +5,7 @@ use self::{
     images::ImageTable,
     musics::MusicTable,
     refs::{
-        music_artists::MusicArtistTable, music_audios::MusicAudioTable,
-        music_images::MusicImageTable,
+        music_artist::MusicArtistTable, music_audio::MusicAudioTable, music_image::MusicImageTable,
     },
 };
 use super::{RefTables, Tables};
@@ -63,13 +62,13 @@ impl Tables for SqliteTables {
         })
     }
 
-    fn music(
+    fn musics(
         &self,
     ) -> Box<&dyn super::Table<Item = super::content::Music, Database = Self::Database>> {
         Box::new(&self.music_table)
     }
 
-    fn image(
+    fn images(
         &self,
     ) -> Box<&dyn super::Table<Item = super::content::Image, Database = Self::Database>> {
         Box::new(&self.image_table)
@@ -81,13 +80,13 @@ impl Tables for SqliteTables {
         Box::new(&self.artist_table)
     }
 
-    fn audio(
+    fn audios(
         &self,
     ) -> Box<&dyn super::Table<Item = super::content::Audio, Database = Self::Database>> {
         Box::new(&self.audio_table)
     }
 
-    fn file(
+    fn files(
         &self,
     ) -> Box<&dyn super::Table<Item = super::content::File, Database = Self::Database>> {
         Box::new(&self.file_table)

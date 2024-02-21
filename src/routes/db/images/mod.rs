@@ -11,7 +11,7 @@ struct ImageData {
 
 #[get("/")]
 pub async fn fetch(db: web::Data<DB>) -> impl Responder {
-    HttpResponse::Ok().json(db.tables.image().get_all().await)
+    HttpResponse::Ok().json(db.tables.images().get_all().await)
 }
 
 #[post("/")]
@@ -23,7 +23,7 @@ pub async fn create(db: web::Data<DB>, data: web::Json<ImageData>) -> impl Respo
         file: image_data.file,
     };
 
-    db.tables.image().save(image.clone()).await;
+    db.tables.images().save(image.clone()).await;
 
     HttpResponse::Ok().json(image)
 }
@@ -32,7 +32,7 @@ pub async fn create(db: web::Data<DB>, data: web::Json<ImageData>) -> impl Respo
 pub async fn read(db: web::Data<DB>, path: web::Path<Uuid>) -> impl Responder {
     let id = path.into_inner();
 
-    if let Some(image) = db.tables.image().get(id.to_string()).await {
+    if let Some(image) = db.tables.images().get(id.to_string()).await {
         return HttpResponse::Ok().json(image);
     }
 

@@ -12,7 +12,7 @@ use std::env;
 
 #[get("/")]
 async fn hello_world(db: web::Data<DB>) -> impl Responder {
-    let table = &db.tables.music();
+    let table = &db.tables.musics();
 
     table.get_all().await;
     HttpResponse::Ok().body("Hello world")

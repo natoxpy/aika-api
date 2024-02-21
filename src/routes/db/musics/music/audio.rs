@@ -22,7 +22,7 @@ pub async fn get_audio(db: web::Data<DB>, path: web::Path<String>) -> impl Respo
     {
         let audio_opt = db
             .tables
-            .audio()
+            .audios()
             .get(music_audio_ref.audio.to_string())
             .await;
 

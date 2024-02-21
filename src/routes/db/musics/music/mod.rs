@@ -9,7 +9,7 @@ pub mod cover;
 pub async fn get_music(db: web::Data<DB>, path: web::Path<String>) -> impl Responder {
     let music_id = path.into_inner();
 
-    if let Some(music) = db.tables.music().get(music_id).await {
+    if let Some(music) = db.tables.musics().get(music_id).await {
         HttpResponse::Ok().json(music)
     } else {
         HttpResponse::NoContent().into()

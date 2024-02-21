@@ -1,3 +1,3 @@
-pub mod music_audios;
-pub mod music_artists;
-pub mod music_images;
+pub mod music_artist;
+pub mod music_audio;
+pub mod music_image;

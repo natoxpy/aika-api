@@ -1,5 +1,5 @@
 use crate::db::content;
-use actix_web::{web, Responder, HttpResponse, post};
+use actix_web::{post, web, HttpResponse, Responder};
 use std::{fs, io::Write, path::PathBuf};
 use uuid::Uuid;
 
@@ -28,7 +28,7 @@ async fn upload_from_url(db: web::Data<DB>, file_url: web::Path<String>) -> impl
         size: body.len() as u64,
     };
 
-    db.tables.file().save(file_record.clone()).await;
+    db.tables.files().save(file_record.clone()).await;
 
     HttpResponse::Ok().json(file_record)
 }

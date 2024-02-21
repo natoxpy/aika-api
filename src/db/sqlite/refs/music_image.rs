@@ -1,20 +1,24 @@
-use std::{pin::Pin, future::Future};
+use std::{future::Future, pin::Pin};
 
-use sqlx::{SqlitePool, Sqlite};
-use crate::db::{Table, content_refs::MusicAudioRef, content::{Music, Audio}, TableFetchWhereMusic, TableMusicAudioRef, TableFetchWhereAudio};
+use crate::db::{
+    content::{Image, Music},
+    content_refs::MusicImageRef,
+    Table, TableFetchWhereImage, TableFetchWhereMusic, TableMusicImageRef,
+};
+use sqlx::{Sqlite, SqlitePool};
 
 #[derive(Clone)]
-pub struct MusicAudioTable {
+pub struct MusicImageTable {
     pub pool: SqlitePool,
 }
 
-impl<Q: ToString + Send + 'static> Table<Q> for MusicAudioTable {
-    type Item = MusicAudioRef;
+impl<Q: ToString + Send + 'static> Table<Q> for MusicImageTable {
+    type Item = MusicImageRef;
     type Database = Sqlite;
 
     fn get(&self, id: Q) -> Pin<Box<dyn Future<Output = Option<Self::Item>> + Send>> {
         let pool = self.pool.clone();
-        let query = "SELECT * FROM music_audios where id = $1;";
+        let query = "SELECT * FROM music_images where id = $1;";
 
         Box::pin(async move {
             if let Ok(item) = sqlx::query_as::<Self::Database, Self::Item>(query)
@@ -31,7 +35,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for MusicAudioTable {
 
     fn get_many(&self, id: Q) -> Pin<Box<dyn Future<Output = Vec<Self::Item>> + Send>> {
         let pool = self.pool.clone();
-        let query = "SELECT * FROM music_audios where id = $1;";
+        let query = "SELECT * FROM music_images where id = $1;";
 
         Box::pin(async move {
             sqlx::query_as::<Self::Database, Self::Item>(query)
@@ -44,7 +48,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for MusicAudioTable {
 
     fn get_all(&self) -> Pin<Box<dyn Future<Output = Vec<Self::Item>> + Send>> {
         let pool = self.pool.clone();
-        let query = "SELECT * FROM music_audios;";
+        let query = "SELECT * FROM music_images;";
 
         Box::pin(async move {
             sqlx::query_as::<Self::Database, Self::Item>(query)
@@ -56,13 +60,13 @@ impl<Q: ToString + Send + 'static> Table<Q> for MusicAudioTable {
 
     fn save(&self, music_image_ref: Self::Item) -> Pin<Box<dyn Future<Output = ()> + Send>> {
         let pool = self.pool.clone();
-        let query = "INSERT INTO music_audios (id, music, audio) VALUES (?, ?);";
+        let query = "INSERT INTO music_images (id, music, image) VALUES (?, ?);";
 
         Box::pin(async move {
             sqlx::query::<Self::Database>(query)
                 .bind(music_image_ref.id.to_string())
                 .bind(music_image_ref.music.to_string())
-                .bind(music_image_ref.audio.to_string())
+                .bind(music_image_ref.image.to_string())
                 .execute(&pool)
                 .await
                 .unwrap();
@@ -74,20 +78,20 @@ impl<Q: ToString + Send + 'static> Table<Q> for MusicAudioTable {
     }
 }
 
-impl<Q: ToString + Send + 'static> TableFetchWhereAudio<Q> for MusicAudioTable {
-    type ItemWhereAudio  = MusicAudioRef;
+impl<Q: ToString + Send + 'static> TableFetchWhereImage<Q> for MusicImageTable {
+    type ItemWhereImage = MusicImageRef;
 
-    fn get_where_audio(
+    fn get_where_image(
         &self,
-        audio: Audio,
-    ) -> Pin<Box<dyn Future<Output = Option<Self::ItemWhereAudio>> + Send>> {
+        image: Image,
+    ) -> Pin<Box<dyn Future<Output = Option<Self::ItemWhereImage>> + Send>> {
         let pool = self.pool.clone();
-        let query = "SELECT * FROM music_audios where audio = $1;";
-        let audio_id = audio.id.clone().to_string();
+        let query = "SELECT * FROM music_images where image = $1;";
+        let image_id = image.id.clone().to_string();
 
         Box::pin(async move {
-            if let Ok(item) = sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereAudio>(query)
-                .bind(audio_id)
+            if let Ok(item) = sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereImage>(query)
+                .bind(image_id)
                 .fetch_one(&pool)
                 .await
             {
@@ -98,15 +102,15 @@ impl<Q: ToString + Send + 'static> TableFetchWhereAudio<Q> for MusicAudioTable {
         })
     }
 
-    fn get_where_audio_id(
+    fn get_where_image_id(
         &self,
         id: Q,
-    ) -> Pin<Box<dyn Future<Output = Option<Self::ItemWhereAudio>> + Send>> {
+    ) -> Pin<Box<dyn Future<Output = Option<Self::ItemWhereImage>> + Send>> {
         let pool = self.pool.clone();
-        let query = "SELECT * FROM music_audios where audio = $1;";
+        let query = "SELECT * FROM music_images where image = $1;";
 
         Box::pin(async move {
-            if let Ok(item) = sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereAudio>(query)
+            if let Ok(item) = sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereImage>(query)
                 .bind(id.to_string())
                 .fetch_one(&pool)
                 .await
@@ -119,15 +123,15 @@ impl<Q: ToString + Send + 'static> TableFetchWhereAudio<Q> for MusicAudioTable {
     }
 }
 
-impl<Q: ToString + Send + 'static> TableFetchWhereMusic<Q> for MusicAudioTable {
-    type ItemWhereMusic = MusicAudioRef;
+impl<Q: ToString + Send + 'static> TableFetchWhereMusic<Q> for MusicImageTable {
+    type ItemWhereMusic = MusicImageRef;
 
     fn get_where_music(
         &self,
         music: Music,
     ) -> Pin<Box<dyn Future<Output = Option<Self::ItemWhereMusic>> + Send>> {
         let pool = self.pool.clone();
-        let query = "SELECT * FROM music_audios where music = $1;";
+        let query = "SELECT * FROM music_images WHERE music = $1;";
         let music_id = music.id.to_string();
 
         Box::pin(async move {
@@ -141,7 +145,6 @@ impl<Q: ToString + Send + 'static> TableFetchWhereMusic<Q> for MusicAudioTable {
                 None
             }
         })
-
     }
 
     fn get_where_music_id(
@@ -149,7 +152,7 @@ impl<Q: ToString + Send + 'static> TableFetchWhereMusic<Q> for MusicAudioTable {
         id: Q,
     ) -> Pin<Box<dyn Future<Output = Option<Self::ItemWhereMusic>> + Send>> {
         let pool = self.pool.clone();
-        let query = "SELECT * FROM music_audios where music = $1;";
+        let query = "SELECT * FROM music_images WHERE music = $1;";
 
         Box::pin(async move {
             if let Ok(item) = sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereMusic>(query)
@@ -162,8 +165,7 @@ impl<Q: ToString + Send + 'static> TableFetchWhereMusic<Q> for MusicAudioTable {
                 None
             }
         })
-
     }
 }
 
-impl TableMusicAudioRef for MusicAudioTable {}
+impl TableMusicImageRef for MusicImageTable {}

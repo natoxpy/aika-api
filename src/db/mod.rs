@@ -54,11 +54,11 @@ pub trait Tables {
     where
         Self: Sized;
 
-    fn music(&self) -> Box<&dyn Table<Item = Music, Database = Self::Database>>;
-    fn image(&self) -> Box<&dyn Table<Item = Image, Database = Self::Database>>;
+    fn musics(&self) -> Box<&dyn Table<Item = Music, Database = Self::Database>>;
+    fn images(&self) -> Box<&dyn Table<Item = Image, Database = Self::Database>>;
     fn artists(&self) -> Box<&dyn Table<Item = Artist, Database = Self::Database>>;
-    fn audio(&self) -> Box<&dyn Table<Item = Audio, Database = Self::Database>>;
-    fn file(&self) -> Box<&dyn Table<Item = File, Database = Self::Database>>;
+    fn audios(&self) -> Box<&dyn Table<Item = Audio, Database = Self::Database>>;
+    fn files(&self) -> Box<&dyn Table<Item = File, Database = Self::Database>>;
 
     fn refs(&self) -> Box<&dyn RefTables<Database = Self::Database>>;
 }

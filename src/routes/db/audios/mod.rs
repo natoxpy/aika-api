@@ -11,7 +11,7 @@ struct AudioData {
 
 #[get("/")]
 pub async fn fetch(db: web::Data<DB>) -> impl Responder {
-    HttpResponse::Ok().json(db.tables.audio().get_all().await)
+    HttpResponse::Ok().json(db.tables.audios().get_all().await)
 }
 
 #[post("/")]
@@ -23,7 +23,7 @@ pub async fn create(db: web::Data<DB>, data: web::Json<AudioData>) -> impl Respo
         file: audio_data.file,
     };
 
-    db.tables.audio().save(audio.clone()).await;
+    db.tables.audios().save(audio.clone()).await;
 
     HttpResponse::Ok().json(audio)
 }
@@ -32,15 +32,19 @@ pub async fn create(db: web::Data<DB>, data: web::Json<AudioData>) -> impl Respo
 pub async fn read(db: web::Data<DB>, path: web::Path<Uuid>) -> impl Responder {
     let id = path.into_inner();
 
-    if let Some(audio) = db.tables.audio().get(id.to_string()).await {
-        return HttpResponse::Ok().json(audio)
+    if let Some(audio) = db.tables.audios().get(id.to_string()).await {
+        return HttpResponse::Ok().json(audio);
     }
 
     HttpResponse::NotFound().into()
 }
 
 #[patch("/{id}")]
-pub async fn update(_db: web::Data<DB>, _path: web::Path<Uuid>, _data: web::Json<AudioData>) -> impl Responder {
+pub async fn update(
+    _db: web::Data<DB>,
+    _path: web::Path<Uuid>,
+    _data: web::Json<AudioData>,
+) -> impl Responder {
     todo!("implement patch HTTP method to audios");
     #[allow(unreachable_code)]
     ""

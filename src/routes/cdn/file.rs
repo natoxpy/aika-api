@@ -8,7 +8,7 @@ use crate::states::{DB, FILES};
 async fn file_cdn(db: web::Data<DB>, path: web::Path<String>) -> impl Responder {
     let file_id: String = path.into_inner();
 
-    let file_opt = db.tables.file().get(file_id.clone()).await;
+    let file_opt = db.tables.files().get(file_id.clone()).await;
 
     if file_opt.is_none() {
         return HttpResponse::NoContent().into();

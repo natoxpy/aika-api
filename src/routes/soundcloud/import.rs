@@ -1,9 +1,12 @@
-use actix_web::{post, web, Responder, HttpResponse};
+use actix_web::{post, web, HttpResponse, Responder};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{
-    db::{content::Music, content_refs::{MusicArtistRef, MusicImageRef}},
+    db::{
+        content::Music,
+        content_refs::{MusicArtistRef, MusicImageRef},
+    },
     states::DB,
 };
 
@@ -50,7 +53,7 @@ async fn import(data: web::Json<ImportData>, db: web::Data<DB>) -> impl Responde
         image: data.image_id,
     };
 
-    db.tables.music().save(music.clone());
+    db.tables.musics().save(music.clone());
     db.tables.refs().music_image().save(music_cover);
 
     HttpResponse::Ok().json(music)

@@ -17,7 +17,7 @@ pub async fn get_avatar(db: web::Data<DB>, path: web::Path<Uuid>) -> impl Respon
 
     if let Some(artist) = artist_opt {
         if let Some(avatar_id) = artist.avatar {
-            if let Some(avatar) = db.tables.image().get(avatar_id).await {
+            if let Some(avatar) = db.tables.images().get(avatar_id).await {
                 return HttpResponse::Ok().json(AvatarResponse {
                     file_id: avatar.file,
                 });

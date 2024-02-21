@@ -22,7 +22,7 @@ pub async fn get_cover(db: web::Data<DB>, path: web::Path<String>) -> impl Respo
     {
         let image_opt = db
             .tables
-            .image()
+            .images()
             .get(music_image_ref.image.to_string())
             .await;
 
