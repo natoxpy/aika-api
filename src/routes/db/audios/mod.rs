@@ -36,7 +36,7 @@ pub async fn read(db: web::Data<DB>, path: web::Path<Uuid>) -> impl Responder {
         return HttpResponse::Ok().json(audio);
     }
 
-    HttpResponse::NotFound().into()
+    HttpResponse::NoContent().into()
 }
 
 #[patch("/{id}")]
