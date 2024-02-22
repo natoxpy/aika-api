@@ -61,7 +61,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for MusicArtistTable {
 
     fn save(&self, music_image_ref: Self::Item) -> Pin<Box<dyn Future<Output = ()> + Send>> {
         let pool = self.pool.clone();
-        let query = "INSERT INTO music_artists (id, music, artist) VALUES (?, ?);";
+        let query = "INSERT INTO music_artists (id, music, artist) VALUES (?, ?, ?);";
 
         Box::pin(async move {
             sqlx::query::<Self::Database>(query)
@@ -146,7 +146,6 @@ impl<Q: ToString + Send + 'static> TableFetchWhereMusic<Q> for MusicArtistTable 
                 None
             }
         })
-
     }
 
     fn get_where_music_id(
@@ -167,9 +166,7 @@ impl<Q: ToString + Send + 'static> TableFetchWhereMusic<Q> for MusicArtistTable 
                 None
             }
         })
-
     }
 }
 
 impl TableMusicArtistRef for MusicArtistTable {}
-

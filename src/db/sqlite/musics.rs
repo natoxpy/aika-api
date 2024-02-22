@@ -54,7 +54,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for MusicTable {
 
     fn save(&self, music: Self::Item) -> Pin<Box<dyn Future<Output = ()> + Send>> {
         let pool = self.pool.clone();
-        let query = "INSERT INTO musics (id, name) VALUES ($1, $2);";
+        let query = "INSERT INTO musics (id, name) VALUES (?, ?);";
 
         Box::pin(async move {
             sqlx::query::<Self::Database>(query)
