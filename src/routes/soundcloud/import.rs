@@ -6,7 +6,7 @@ use uuid::Uuid;
 use crate::{
     db::{
         content::{Audio, Music},
-        content_refs::{MusicArtistRef, MusicAudioRef, MusicImageRef},
+        content_refs::{MusicAlbumRef, MusicArtistRef, MusicAudioRef, MusicImageRef},
     },
     routes::fs::upload::upload_from_url_standalone,
     states::DB,
@@ -70,6 +70,16 @@ async fn import(data: web::Json<ImportData>, db: web::Data<DB>) -> impl Responde
         };
 
         db.tables.refs().music_artist().save(music_artist).await;
+    }
+
+    for album in data.albums_id.iter() {
+        let music_album = MusicAlbumRef {
+            id: Uuid::new_v4(),
+            music: music.id,
+            album: album.clone(),
+        };
+
+        db.tables.refs().music_album().save(music_album).await;
     }
 
     let music_cover = MusicImageRef {
