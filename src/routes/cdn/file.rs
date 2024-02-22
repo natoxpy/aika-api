@@ -18,7 +18,13 @@ async fn file_cdn(db: web::Data<DB>, path: web::Path<String>) -> impl Responder 
 
     let path = PathBuf::from(format!("{}{}", FILES, file_db.location));
 
-    let file = fs::read(path).unwrap();
+    let file_fs_opt = fs::read(path);
+
+    if file_fs_opt.is_err() {
+        return HttpResponse::NoContent().into();
+    }
+
+    let file = file_fs_opt.unwrap();
 
     let mut response = HttpResponse::Ok();
 
