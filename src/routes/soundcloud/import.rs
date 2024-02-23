@@ -8,7 +8,7 @@ use crate::{
         content::{Audio, Music},
         content_refs::{MusicAlbumRef, MusicArtistRef, MusicAudioRef, MusicImageRef},
     },
-    routes::fs::upload::upload_from_url_standalone,
+    routes::fs::upload::{get_bytes_from_url, upload_from_bytes},
     states::DB,
 };
 
@@ -34,7 +34,7 @@ async fn import(data: web::Json<ImportData>, db: web::Data<DB>) -> impl Responde
     let track = Track::get_song(&data.soundcloud_url).await;
 
     let media = track.media.get_progressive(&track.client_id).await;
-    let audio_file = upload_from_url_standalone(media).await;
+    let audio_file = upload_from_bytes(get_bytes_from_url(media).await).await;
 
     let audio_record = Audio {
         id: Uuid::new_v4(),
