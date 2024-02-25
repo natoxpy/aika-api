@@ -1,6 +1,5 @@
 pub mod import;
 pub mod preview;
-pub mod download;
 
 use actix_web::{web, Scope};
 

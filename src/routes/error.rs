@@ -4,15 +4,18 @@
 use actix_web::{HttpResponse, ResponseError};
 use mime::FromStrError;
 use reqwest::StatusCode;
+use sclouddl::error::ScloudError;
 use std::fmt::Display;
 
 #[derive(Debug)]
 pub enum Error {
     DB(crate::db::Error),
     FromStr(FromStrError),
+    ParseUrl(url::ParseError),
     IO(std::io::Error),
     Reqwest(reqwest::Error),
     Other(String),
+    Scloud(ScloudError),
 }
 
 impl Display for Error {
@@ -23,6 +26,8 @@ impl Display for Error {
             Error::IO(error) => write!(f, "{:?}", error),
             Error::Reqwest(error) => write!(f, "{:?}", error),
             Error::Other(msg) => write!(f, "{}", msg),
+            Error::Scloud(error) => write!(f, "{:?}", error),
+            Error::ParseUrl(error) => write!(f, "{:?}", error),
         }
     }
 }
@@ -63,6 +68,8 @@ impl ResponseError for Error {
             Error::IO(_) => StatusCode::NOT_FOUND,
             Error::Reqwest(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Error::Other(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Error::Scloud(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Error::ParseUrl(_) => StatusCode::INTERNAL_SERVER_ERROR,
         };
         status_code
     }
