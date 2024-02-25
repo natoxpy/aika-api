@@ -35,7 +35,7 @@ pub async fn create(db: web::Data<DB>, data: web::Json<ArtistData>) -> impl Resp
 pub async fn read(db: web::Data<DB>, path: web::Path<Uuid>) -> impl Responder {
     let id = path.into_inner();
 
-    if let Some(artist) = db.tables.artists().get(id.to_string()).await {
+    if let Ok(artist) = db.tables.artists().get(id.to_string()).await {
         return HttpResponse::Ok().json(artist);
     }
 

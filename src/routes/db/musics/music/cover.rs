@@ -13,7 +13,7 @@ struct CoverResponse {
 pub async fn get_cover(db: web::Data<DB>, path: web::Path<String>) -> impl Responder {
     let music_id = path.into_inner();
 
-    if let Some(music_image_ref) = db
+    if let Ok(music_image_ref) = db
         .tables
         .refs()
         .music_image()
@@ -26,7 +26,7 @@ pub async fn get_cover(db: web::Data<DB>, path: web::Path<String>) -> impl Respo
             .get(music_image_ref.image.to_string())
             .await;
 
-        if let Some(image) = image_opt {
+        if let Ok(image) = image_opt {
             let res = CoverResponse {
                 file_id: image.file,
             };

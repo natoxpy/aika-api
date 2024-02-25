@@ -11,20 +11,19 @@ impl<Q: ToString + Send + 'static> Table<Q> for FileTable {
     type Item = File;
     type Database = Sqlite;
 
-    fn get(&self, id: Q) -> Pin<Box<dyn Future<Output = Option<Self::Item>> + Send>> {
+    fn get(
+        &self,
+        id: Q,
+    ) -> Pin<Box<dyn Future<Output = Result<Self::Item, crate::db::Error>> + Send>> {
         let pool = self.pool.clone();
         let query = "SELECT * FROM files WHERE id = $1;";
 
         Box::pin(async move {
-            if let Ok(item) = sqlx::query_as::<Self::Database, Self::Item>(query)
+            sqlx::query_as::<Self::Database, Self::Item>(query)
                 .bind(id.to_string())
                 .fetch_one(&pool)
                 .await
-            {
-                Some(item)
-            } else {
-                None
-            }
+                .map_err(|err| crate::db::Error::Sqlx(err))
         })
     }
 

@@ -37,7 +37,7 @@ pub async fn create(db: web::Data<DB>, data: web::Json<AlbumData>) -> impl Respo
 pub async fn read(db: web::Data<DB>, path: web::Path<Uuid>) -> impl Responder {
     let id = path.into_inner();
 
-    if let Some(album) = db.tables.albums().get(id.to_string()).await {
+    if let Ok(album) = db.tables.albums().get(id.to_string()).await {
         return HttpResponse::Ok().json(album);
     }
 

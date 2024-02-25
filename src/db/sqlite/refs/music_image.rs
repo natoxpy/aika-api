@@ -16,20 +16,19 @@ impl<Q: ToString + Send + 'static> Table<Q> for MusicImageTable {
     type Item = MusicImageRef;
     type Database = Sqlite;
 
-    fn get(&self, id: Q) -> Pin<Box<dyn Future<Output = Option<Self::Item>> + Send>> {
+    fn get(
+        &self,
+        id: Q,
+    ) -> Pin<Box<dyn Future<Output = Result<Self::Item, crate::db::Error>> + Send>> {
         let pool = self.pool.clone();
         let query = "SELECT * FROM music_images where id = $1;";
 
         Box::pin(async move {
-            if let Ok(item) = sqlx::query_as::<Self::Database, Self::Item>(query)
+            sqlx::query_as::<Self::Database, Self::Item>(query)
                 .bind(id.to_string())
                 .fetch_one(&pool)
                 .await
-            {
-                Some(item)
-            } else {
-                None
-            }
+                .map_err(|err| crate::db::Error::Sqlx(err))
         })
     }
 
@@ -96,41 +95,33 @@ impl<Q: ToString + Send + 'static> TableFetchWhereImage<Q> for MusicImageTable {
     fn get_where_image(
         &self,
         image: Image,
-    ) -> Pin<Box<dyn Future<Output = Option<Self::ItemWhereImage>> + Send>> {
+    ) -> Pin<Box<dyn Future<Output = Result<Self::ItemWhereImage, crate::db::Error>> + Send>> {
         let pool = self.pool.clone();
         let query = "SELECT * FROM music_images where image = $1;";
         let image_id = image.id.clone().to_string();
 
         Box::pin(async move {
-            if let Ok(item) = sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereImage>(query)
+            sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereImage>(query)
                 .bind(image_id)
                 .fetch_one(&pool)
                 .await
-            {
-                Some(item)
-            } else {
-                None
-            }
+                .map_err(|err| crate::db::Error::Sqlx(err))
         })
     }
 
     fn get_where_image_id(
         &self,
         id: Q,
-    ) -> Pin<Box<dyn Future<Output = Option<Self::ItemWhereImage>> + Send>> {
+    ) -> Pin<Box<dyn Future<Output = Result<Self::ItemWhereImage, crate::db::Error>> + Send>> {
         let pool = self.pool.clone();
         let query = "SELECT * FROM music_images where image = $1;";
 
         Box::pin(async move {
-            if let Ok(item) = sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereImage>(query)
+            sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereImage>(query)
                 .bind(id.to_string())
                 .fetch_one(&pool)
                 .await
-            {
-                Some(item)
-            } else {
-                None
-            }
+                .map_err(|err| crate::db::Error::Sqlx(err))
         })
     }
 }
@@ -141,41 +132,33 @@ impl<Q: ToString + Send + 'static> TableFetchWhereMusic<Q> for MusicImageTable {
     fn get_where_music(
         &self,
         music: Music,
-    ) -> Pin<Box<dyn Future<Output = Option<Self::ItemWhereMusic>> + Send>> {
+    ) -> Pin<Box<dyn Future<Output = Result<Self::ItemWhereMusic, crate::db::Error>> + Send>> {
         let pool = self.pool.clone();
         let query = "SELECT * FROM music_images WHERE music = $1;";
         let music_id = music.id.to_string();
 
         Box::pin(async move {
-            if let Ok(item) = sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereMusic>(query)
+            sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereMusic>(query)
                 .bind(music_id)
                 .fetch_one(&pool)
                 .await
-            {
-                Some(item)
-            } else {
-                None
-            }
+                .map_err(|err| crate::db::Error::Sqlx(err))
         })
     }
 
     fn get_where_music_id(
         &self,
         id: Q,
-    ) -> Pin<Box<dyn Future<Output = Option<Self::ItemWhereMusic>> + Send>> {
+    ) -> Pin<Box<dyn Future<Output = Result<Self::ItemWhereMusic, crate::db::Error>> + Send>> {
         let pool = self.pool.clone();
         let query = "SELECT * FROM music_images WHERE music = $1;";
 
         Box::pin(async move {
-            if let Ok(item) = sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereMusic>(query)
+            sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereMusic>(query)
                 .bind(id.to_string())
                 .fetch_one(&pool)
                 .await
-            {
-                Some(item)
-            } else {
-                None
-            }
+                .map_err(|err| crate::db::Error::Sqlx(err))
         })
     }
 }

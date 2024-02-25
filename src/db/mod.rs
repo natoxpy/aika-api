@@ -93,7 +93,10 @@ pub trait Table<Q: ToString + Send + 'static = String> {
     type Item;
     type Database: sqlx::Database;
 
-    fn get(&self, id: Q) -> Pin<Box<dyn Future<Output = Option<Self::Item>> + Send>>;
+    fn get(
+        &self,
+        id: Q,
+    ) -> Pin<Box<dyn Future<Output = Result<Self::Item, crate::db::Error>> + Send>>;
 
     fn get_many(
         &self,
@@ -117,9 +120,8 @@ macro_rules! TableSearchFor {
         paste! {
             pub trait [<TableFetchWhere $a>]<Q: ToString + Send + 'static = String> {
                 type [<Item Where $a>];
-                fn [<get_where_ $a:lower>](&self, [<$a:lower>]: $a) -> Pin<Box<dyn Future<Output = Option<Self::[<Item Where $a>]>> + Send>>;
-                fn [<get_where_ $a:lower _id>](&self, id: Q) -> Pin<Box<dyn Future<Output = Option<Self::[<Item Where $a>]>> + Send>>;
-
+                fn [<get_where_ $a:lower>](&self, [<$a:lower>]: $a) -> Pin<Box<dyn Future<Output = Result<Self::[<Item Where $a>], crate::db::Error>> + Send>>;
+                fn [<get_where_ $a:lower _id>](&self, id: Q) -> Pin<Box<dyn Future<Output = Result<Self::[<Item Where $a>], crate::db::Error>> + Send>>;
             }
         }
     };

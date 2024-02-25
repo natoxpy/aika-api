@@ -13,7 +13,7 @@ struct AudioResponse {
 pub async fn get_audio(db: web::Data<DB>, path: web::Path<String>) -> impl Responder {
     let music_id = path.into_inner();
 
-    if let Some(music_audio_ref) = db
+    if let Ok(music_audio_ref) = db
         .tables
         .refs()
         .music_audio()
@@ -26,7 +26,7 @@ pub async fn get_audio(db: web::Data<DB>, path: web::Path<String>) -> impl Respo
             .get(music_audio_ref.audio.to_string())
             .await;
 
-        if let Some(audio) = audio_opt {
+        if let Ok(audio) = audio_opt {
             let res = AudioResponse {
                 file_id: audio.file,
             };
