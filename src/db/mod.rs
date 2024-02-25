@@ -9,8 +9,8 @@ use std::{future::Future, pin::Pin};
 use self::{
     content::{Album, Artist, Audio, File, Image, Music},
     content_refs::{AlbumArtistRef, MusicAlbumRef, MusicArtistRef, MusicAudioRef, MusicImageRef},
-    error::Error,
 };
+pub use error::Error;
 
 pub trait RefTables {
     type Database: sqlx::Database;

@@ -1,7 +1,9 @@
 pub mod cdn;
-pub mod youtube;
+pub mod db;
+pub mod error;
+pub mod fs;
 pub mod nyaa;
 pub mod soundcloud;
-pub mod db;
-pub mod fs;
+pub mod youtube;
 
+pub use error::Error;

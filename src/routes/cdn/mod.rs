@@ -1,5 +1,4 @@
 pub mod file;
-
 use actix_web::{web, Scope};
 
 pub fn scope() -> Scope {
