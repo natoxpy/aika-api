@@ -14,7 +14,7 @@ use std::env;
 async fn hello_world(db: web::Data<DB>) -> impl Responder {
     let table = &db.tables.musics();
 
-    table.get_all().await;
+    table.get_all().await.unwrap();
     HttpResponse::Ok().body("Hello world")
 }
 

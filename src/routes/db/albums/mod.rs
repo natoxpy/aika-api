@@ -14,7 +14,7 @@ struct AlbumData {
 
 #[get("/")]
 pub async fn fetch(db: web::Data<DB>) -> impl Responder {
-    HttpResponse::Ok().json(db.tables.albums().get_all().await)
+    HttpResponse::Ok().json(db.tables.albums().get_all().await.unwrap())
 }
 
 #[post("/")]
@@ -28,7 +28,7 @@ pub async fn create(db: web::Data<DB>, data: web::Json<AlbumData>) -> impl Respo
         released: None,
     };
 
-    db.tables.albums().save(album.clone()).await;
+    db.tables.albums().save(album.clone()).await.unwrap();
 
     HttpResponse::Ok().json(album)
 }

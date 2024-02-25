@@ -11,7 +11,7 @@ struct AudioData {
 
 #[get("/")]
 pub async fn fetch(db: web::Data<DB>) -> impl Responder {
-    HttpResponse::Ok().json(db.tables.audios().get_all().await)
+    HttpResponse::Ok().json(db.tables.audios().get_all().await.unwrap())
 }
 
 #[post("/")]
@@ -23,7 +23,7 @@ pub async fn create(db: web::Data<DB>, data: web::Json<AudioData>) -> impl Respo
         file: audio_data.file,
     };
 
-    db.tables.audios().save(audio.clone()).await;
+    db.tables.audios().save(audio.clone()).await.unwrap();
 
     HttpResponse::Ok().json(audio)
 }

@@ -7,15 +7,11 @@ pub struct FileTable {
     pub pool: Pool<Sqlite>,
 }
 
-impl<Q: ToString + Send + 'static> Table<Q> for FileTable
-{
+impl<Q: ToString + Send + 'static> Table<Q> for FileTable {
     type Item = File;
     type Database = Sqlite;
 
-    fn get(
-        &self,
-        id: Q,
-    ) -> Pin<Box<dyn Future<Output = Option<Self::Item>> + Send>> {
+    fn get(&self, id: Q) -> Pin<Box<dyn Future<Output = Option<Self::Item>> + Send>> {
         let pool = self.pool.clone();
         let query = "SELECT * FROM files WHERE id = $1;";
 
@@ -35,7 +31,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for FileTable
     fn get_many(
         &self,
         id: Q,
-    ) -> Pin<Box<dyn Future<Output = Vec<Self::Item>> + Send>> {
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<Self::Item>, crate::db::Error>> + Send>> {
         let pool = self.pool.clone();
         let query = "SELECT * FROM files WHERE id = $1;";
 
@@ -44,11 +40,13 @@ impl<Q: ToString + Send + 'static> Table<Q> for FileTable
                 .bind(id.to_string())
                 .fetch_all(&pool)
                 .await
-                .unwrap()
+                .map_err(|err| crate::db::Error::Sqlx(err))
         })
     }
 
-    fn get_all(&self) -> Pin<Box<dyn Future<Output = Vec<Self::Item>> + Send>> {
+    fn get_all(
+        &self,
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<Self::Item>, crate::db::Error>> + Send>> {
         let pool = self.pool.clone();
         let query = "SELECT * FROM files;";
 
@@ -56,11 +54,14 @@ impl<Q: ToString + Send + 'static> Table<Q> for FileTable
             sqlx::query_as::<Self::Database, Self::Item>(query)
                 .fetch_all(&pool)
                 .await
-                .unwrap()
+                .map_err(|err| crate::db::Error::Sqlx(err))
         })
     }
 
-    fn save(&self, item: Self::Item) -> Pin<Box<dyn Future<Output = ()> + Send>> {
+    fn save(
+        &self,
+        item: Self::Item,
+    ) -> Pin<Box<dyn Future<Output = Result<(), crate::db::Error>> + Send>> {
         let pool = self.pool.clone();
         let query = "INSERT INTO files (id, name, location, size, mime) VALUES (?, ?, ?, ?, ?);";
 
@@ -73,11 +74,15 @@ impl<Q: ToString + Send + 'static> Table<Q> for FileTable
                 .bind(item.mime)
                 .execute(&pool)
                 .await
-                .unwrap();
+                .map_err(|err| crate::db::Error::Sqlx(err))?;
+            Ok(())
         })
     }
 
-    fn save_many(&self, _items: Vec<Self::Item>) -> Pin<Box<dyn Future<Output = ()> + Send>> {
+    fn save_many(
+        &self,
+        _items: Vec<Self::Item>,
+    ) -> Pin<Box<dyn Future<Output = Result<(), crate::db::Error>> + Send>> {
         todo!()
     }
 }

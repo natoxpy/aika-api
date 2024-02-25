@@ -34,7 +34,7 @@ pub async fn upload_from_bytes(bytes: Vec<u8>) -> File {
 #[post("/upload")]
 async fn upload_from_buffer(db: web::Data<DB>, data: web::Bytes) -> impl Responder {
     let file = upload_from_bytes(data.to_vec()).await;
-    db.tables.files().save(file.clone()).await;
+    db.tables.files().save(file.clone()).await.unwrap();
     HttpResponse::Ok().json(&file)
 }
 
@@ -42,7 +42,7 @@ async fn upload_from_buffer(db: web::Data<DB>, data: web::Bytes) -> impl Respond
 async fn upload_from_url(db: web::Data<DB>, file_url: web::Path<String>) -> impl Responder {
     let file_record = upload_from_bytes(get_bytes_from_url(file_url.into_inner()).await).await;
 
-    db.tables.files().save(file_record.clone()).await;
+    db.tables.files().save(file_record.clone()).await.unwrap();
 
     HttpResponse::Ok().json(file_record)
 }

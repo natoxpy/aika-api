@@ -1,5 +1,6 @@
 pub mod content;
 pub mod content_refs;
+pub mod error;
 pub mod sqlite;
 
 use paste::paste;
@@ -8,6 +9,7 @@ use std::{future::Future, pin::Pin};
 use self::{
     content::{Album, Artist, Audio, File, Image, Music},
     content_refs::{AlbumArtistRef, MusicAlbumRef, MusicArtistRef, MusicAudioRef, MusicImageRef},
+    error::Error,
 };
 
 pub trait RefTables {
@@ -93,13 +95,21 @@ pub trait Table<Q: ToString + Send + 'static = String> {
 
     fn get(&self, id: Q) -> Pin<Box<dyn Future<Output = Option<Self::Item>> + Send>>;
 
-    fn get_many(&self, id: Q) -> Pin<Box<dyn Future<Output = Vec<Self::Item>> + Send>>;
+    fn get_many(
+        &self,
+        id: Q,
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<Self::Item>, error::Error>> + Send>>;
 
-    fn get_all(&self) -> Pin<Box<dyn Future<Output = Vec<Self::Item>> + Send>>;
+    fn get_all(
+        &self,
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<Self::Item>, error::Error>> + Send>>;
 
-    fn save(&self, item: Self::Item) -> Pin<Box<dyn Future<Output = ()> + Send>>;
+    fn save(&self, item: Self::Item) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>>;
 
-    fn save_many(&self, items: Vec<Self::Item>) -> Pin<Box<dyn Future<Output = ()> + Send>>;
+    fn save_many(
+        &self,
+        items: Vec<Self::Item>,
+    ) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>>;
 }
 
 macro_rules! TableSearchFor {

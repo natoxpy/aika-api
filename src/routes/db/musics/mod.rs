@@ -6,7 +6,7 @@ use crate::states::DB;
 
 #[get("/")]
 pub async fn get_musics(db: web::Data<DB>) -> impl Responder {
-    HttpResponse::Ok().json(db.tables.musics().get_all().await)
+    HttpResponse::Ok().json(db.tables.musics().get_all().await.unwrap())
 }
 
 pub fn scope() -> Scope {
