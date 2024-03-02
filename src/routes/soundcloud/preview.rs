@@ -52,8 +52,6 @@ pub async fn get_track(soundcloud_url: String) -> Result<Track, routes::Error> {
 
 #[get("/metadata/{soundcloud_url}")]
 pub async fn metadata(soundcloud_url: web::Path<String>) -> Result<HttpResponse, routes::Error> {
-    let (track, client_id) = get_track_with_client_id(soundcloud_url.into_inner()).await?;
-    println!("{:#?}\n{}", track, client_id);
-
+    let track = get_track(soundcloud_url.into_inner()).await?;
     Ok(HttpResponse::Ok().json(track))
 }

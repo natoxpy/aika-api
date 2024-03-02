@@ -18,11 +18,11 @@ use crate::{
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SoundcloudImport {
     pub title: String,
-    pub image_id: Uuid,
     pub soundcloud_url: String,
     pub artists_id: Vec<Uuid>,
     pub featured_artists_id: Vec<Uuid>,
     pub albums_id: Vec<Uuid>,
+    pub image_id: Uuid,
 }
 
 #[post("/import")]
