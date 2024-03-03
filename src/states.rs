@@ -1,6 +1,6 @@
 use crate::db::{sqlite::SqliteTables, Tables};
 
-pub const FILES: &'static str = "/home/natoxpy/.aika";
+pub const FILES: &'static str = "/home/toxpy/.aika";
 
 pub struct DB<T: sqlx::Database = sqlx::Sqlite> {
     pub tables: Box<dyn Tables<Database = T>>,
