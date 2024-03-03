@@ -1,17 +1,41 @@
 pub mod content;
 pub mod content_refs;
+pub mod error;
 pub mod sqlite;
 
 use paste::paste;
 use std::{future::Future, pin::Pin};
 
 use self::{
-    content::{Artist, Audio, File, Image, Music},
-    content_refs::{MusicArtistRef, MusicAudioRef, MusicImageRef},
+    content::{Album, Artist, Audio, File, Image, Music},
+    content_refs::{AlbumArtistRef, MusicAlbumRef, MusicArtistRef, MusicAudioRef, MusicImageRef},
 };
+pub use error::Error;
 
 pub trait RefTables {
     type Database: sqlx::Database;
+
+    fn album_artist(
+        &self,
+    ) -> Box<
+        &dyn TableAlbumArtistRef<
+            Item = AlbumArtistRef,
+            ItemWhereAlbum = AlbumArtistRef,
+            ItemWhereArtist = AlbumArtistRef,
+            Database = Self::Database,
+        >,
+    >;
+
+    fn music_album(
+        &self,
+    ) -> Box<
+        &dyn TableMusicAlbumRef<
+            Item = MusicAlbumRef,
+            ItemWhereMusic = MusicAlbumRef,
+            ItemWhereAlbum = MusicAlbumRef,
+            Database = Self::Database,
+        >,
+    >;
 
     fn music_artist(
         &self,
@@ -54,11 +78,12 @@ pub trait Tables {
     where
         Self: Sized;
 
-    fn music(&self) -> Box<&dyn Table<Item = Music, Database = Self::Database>>;
-    fn image(&self) -> Box<&dyn Table<Item = Image, Database = Self::Database>>;
+    fn musics(&self) -> Box<&dyn Table<Item = Music, Database = Self::Database>>;
+    fn albums(&self) -> Box<&dyn Table<Item = Album, Database = Self::Database>>;
+    fn images(&self) -> Box<&dyn Table<Item = Image, Database = Self::Database>>;
     fn artists(&self) -> Box<&dyn Table<Item = Artist, Database = Self::Database>>;
-    fn audio(&self) -> Box<&dyn Table<Item = Audio, Database = Self::Database>>;
-    fn file(&self) -> Box<&dyn Table<Item = File, Database = Self::Database>>;
+    fn audios(&self) -> Box<&dyn Table<Item = Audio, Database = Self::Database>>;
+    fn files(&self) -> Box<&dyn Table<Item = File, Database = Self::Database>>;
 
     fn refs(&self) -> Box<&dyn RefTables<Database = Self::Database>>;
 }
@@ -68,15 +93,26 @@ pub trait Table<Q: ToString + Send + 'static = String> {
     type Item;
     type Database: sqlx::Database;
 
-    fn get(&self, id: Q) -> Pin<Box<dyn Future<Output = Option<Self::Item>> + Send>>;
+    fn get(
+        &self,
+        id: Q,
+    ) -> Pin<Box<dyn Future<Output = Result<Self::Item, crate::db::Error>> + Send>>;
 
-    fn get_many(&self, id: Q) -> Pin<Box<dyn Future<Output = Vec<Self::Item>> + Send>>;
+    fn get_many(
+        &self,
+        id: Q,
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<Self::Item>, error::Error>> + Send>>;
 
-    fn get_all(&self) -> Pin<Box<dyn Future<Output = Vec<Self::Item>> + Send>>;
+    fn get_all(
+        &self,
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<Self::Item>, error::Error>> + Send>>;
 
-    fn save(&self, item: Self::Item) -> Pin<Box<dyn Future<Output = ()> + Send>>;
+    fn save(&self, item: Self::Item) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>>;
 
-    fn save_many(&self, items: Vec<Self::Item>) -> Pin<Box<dyn Future<Output = ()> + Send>>;
+    fn save_many(
+        &self,
+        items: Vec<Self::Item>,
+    ) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>>;
 }
 
 macro_rules! TableSearchFor {
@@ -84,9 +120,8 @@ macro_rules! TableSearchFor {
         paste! {
             pub trait [<TableFetchWhere $a>]<Q: ToString + Send + 'static = String> {
                 type [<Item Where $a>];
-                fn [<get_where_ $a:lower>](&self, [<$a:lower>]: $a) -> Pin<Box<dyn Future<Output = Option<Self::[<Item Where $a>]>> + Send>>;
-                fn [<get_where_ $a:lower _id>](&self, id: Q) -> Pin<Box<dyn Future<Output = Option<Self::[<Item Where $a>]>> + Send>>;
-
+                fn [<get_where_ $a:lower>](&self, [<$a:lower>]: $a) -> Pin<Box<dyn Future<Output = Result<Self::[<Item Where $a>], crate::db::Error>> + Send>>;
+                fn [<get_where_ $a:lower _id>](&self, id: Q) -> Pin<Box<dyn Future<Output = Result<Self::[<Item Where $a>], crate::db::Error>> + Send>>;
             }
         }
     };
@@ -96,7 +131,10 @@ TableSearchFor!(Music);
 TableSearchFor!(Image);
 TableSearchFor!(Audio);
 TableSearchFor!(Artist);
+TableSearchFor!(Album);
 
 pub trait TableMusicArtistRef: Table + TableFetchWhereMusic + TableFetchWhereArtist {}
 pub trait TableMusicImageRef: Table + TableFetchWhereMusic + TableFetchWhereImage {}
 pub trait TableMusicAudioRef: Table + TableFetchWhereMusic + TableFetchWhereAudio {}
+pub trait TableMusicAlbumRef: Table + TableFetchWhereMusic + TableFetchWhereAlbum {}
+pub trait TableAlbumArtistRef: Table + TableFetchWhereArtist + TableFetchWhereAlbum {}

@@ -1,30 +1,36 @@
 use std::{fs, path::PathBuf};
 
-use actix_web::{get, http::header, web, HttpResponse, Responder};
+use actix_web::{get, http::header, web, HttpResponse};
 
 use crate::states::{DB, FILES};
 
 #[get("/{file_id}")]
-async fn file_cdn(db: web::Data<DB>, path: web::Path<String>) -> impl Responder {
+async fn file_cdn(
+    db: web::Data<DB>,
+    path: web::Path<String>,
+) -> Result<HttpResponse, crate::routes::Error> {
     let file_id: String = path.into_inner();
 
-    let file_opt = db.tables.file().get(file_id.clone()).await;
+    let file_record = db
+        .tables
+        .files()
+        .get(file_id.clone())
+        .await
+        .map_err(|err| crate::routes::Error::DB(err))?;
 
-    if file_opt.is_none() {
-        return HttpResponse::NoContent().into();
-    }
-
-    let file = file_opt.unwrap();
-
-    let path = PathBuf::from(format!("{}{}", FILES, file.location));
-
-    let file = fs::read(path).unwrap();
+    let path = PathBuf::from(format!("{}{}", FILES, file_record.location));
+    let file = fs::read(path).map_err(|err| crate::routes::Error::IO(err))?;
 
     let mut response = HttpResponse::Ok();
 
-    response.insert_header(("Content-Type", mime::MPEG.to_string()));
+    let mime = file_record
+        .mime
+        .parse::<mime::Mime>()
+        .map_err(|err| crate::routes::Error::FromStr(err))?;
+
+    response.insert_header(("Content-Type", mime.to_string()));
     response.insert_header(header::ContentLength(file.len()));
     response.insert_header((header::TRANSFER_ENCODING, "chunked"));
 
-    response.body(file)
+    Ok(response.body(file))
 }

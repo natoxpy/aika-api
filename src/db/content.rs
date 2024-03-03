@@ -9,33 +9,34 @@ pub struct Music {
     pub name: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Image {
     pub file: Uuid,
     pub id: Uuid,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Artist {
     pub id: Uuid,
     pub name: String,
+    pub avatar: Option<String>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Album {
     pub id: Uuid,
     pub name: String,
-    pub cover: Uuid,
+    pub cover: Option<Uuid>,
     pub released: Option<chrono::DateTime<Utc>>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Audio {
     pub id: Uuid,
     pub file: Uuid,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct File {
     pub id: Uuid,
     pub name: String,
@@ -92,10 +93,12 @@ where
     fn from_row(row: &'r R) -> Result<Self, sqlx::Error> {
         let id: String = row.try_get("id")?;
         let name: String = row.try_get("name")?;
+        let avatar: Option<String> = row.try_get("avatar")?;
 
         Ok(Self {
-            id: Uuid::parse_str(&id).unwrap(),
             name,
+            avatar,
+            id: Uuid::parse_str(&id).unwrap(),
         })
     }
 }
@@ -149,11 +152,14 @@ where
     &'r str: ColumnIndex<R>,
     String: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
     i64: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
+    // FIXME: Uuid could not be read correctly, possibly reimplement later
+    // Uuid: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
 {
     fn from_row(row: &'r R) -> Result<Self, sqlx::Error> {
         let id: String = row.try_get("id")?;
         let name: String = row.try_get("name")?;
-        let cover: String = row.try_get("cover")?;
+        // TODO: Implement cover
+        // let cover: Option<Uuid> = row.try_get("cover")?;
 
         // TODO: Implemented release date for cover
         // let released: String = row.try_get("released")?;
@@ -161,7 +167,7 @@ where
         Ok(Self {
             id: Uuid::parse_str(&id).unwrap(),
             name,
-            cover: Uuid::parse_str(&cover).unwrap(),
+            cover: None,
             released: None,
         })
     }
