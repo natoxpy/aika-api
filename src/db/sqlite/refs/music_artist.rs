@@ -29,7 +29,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for MusicArtistTable {
                 .bind(id.to_string())
                 .fetch_one(&pool)
                 .await
-                .map_err(|err| crate::db::Error::Sqlx(err))
+                .map_err(crate::db::Error::Sqlx)
         })
     }
 
@@ -45,7 +45,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for MusicArtistTable {
                 .bind(id.to_string())
                 .fetch_all(&pool)
                 .await
-                .map_err(|err| crate::db::Error::Sqlx(err))
+                .map_err(crate::db::Error::Sqlx)
         })
     }
 
@@ -59,7 +59,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for MusicArtistTable {
             sqlx::query_as::<Self::Database, Self::Item>(query)
                 .fetch_all(&pool)
                 .await
-                .map_err(|err| crate::db::Error::Sqlx(err))
+                .map_err(crate::db::Error::Sqlx)
         })
     }
 
@@ -77,7 +77,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for MusicArtistTable {
                 .bind(music_image_ref.artist.to_string())
                 .execute(&pool)
                 .await
-                .map_err(|err| crate::db::Error::Sqlx(err))?;
+                .map_err(crate::db::Error::Sqlx)?;
             Ok(())
         })
     }
@@ -106,7 +106,7 @@ impl<Q: ToString + Send + 'static> TableFetchWhereArtist<Q> for MusicArtistTable
                 .bind(artist_id)
                 .fetch_one(&pool)
                 .await
-                .map_err(|err| crate::db::Error::Sqlx(err))
+                .map_err(crate::db::Error::Sqlx)
         })
     }
 
@@ -122,7 +122,7 @@ impl<Q: ToString + Send + 'static> TableFetchWhereArtist<Q> for MusicArtistTable
                 .bind(id.to_string())
                 .fetch_one(&pool)
                 .await
-                .map_err(|err| crate::db::Error::Sqlx(err))
+                .map_err(crate::db::Error::Sqlx)
         })
     }
 }
@@ -143,7 +143,7 @@ impl<Q: ToString + Send + 'static> TableFetchWhereMusic<Q> for MusicArtistTable 
                 .bind(music_id)
                 .fetch_one(&pool)
                 .await
-                .map_err(|err| crate::db::Error::Sqlx(err))
+                .map_err(crate::db::Error::Sqlx)
         })
     }
 
@@ -159,7 +159,7 @@ impl<Q: ToString + Send + 'static> TableFetchWhereMusic<Q> for MusicArtistTable 
                 .bind(id.to_string())
                 .fetch_one(&pool)
                 .await
-                .map_err(|err| crate::db::Error::Sqlx(err))
+                .map_err(crate::db::Error::Sqlx)
         })
     }
 }

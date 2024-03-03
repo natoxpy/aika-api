@@ -23,7 +23,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for FileTable {
                 .bind(id.to_string())
                 .fetch_one(&pool)
                 .await
-                .map_err(|err| crate::db::Error::Sqlx(err))
+                .map_err(crate::db::Error::Sqlx)
         })
     }
 
@@ -39,7 +39,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for FileTable {
                 .bind(id.to_string())
                 .fetch_all(&pool)
                 .await
-                .map_err(|err| crate::db::Error::Sqlx(err))
+                .map_err(crate::db::Error::Sqlx)
         })
     }
 
@@ -53,7 +53,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for FileTable {
             sqlx::query_as::<Self::Database, Self::Item>(query)
                 .fetch_all(&pool)
                 .await
-                .map_err(|err| crate::db::Error::Sqlx(err))
+                .map_err(crate::db::Error::Sqlx)
         })
     }
 
@@ -73,7 +73,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for FileTable {
                 .bind(item.mime)
                 .execute(&pool)
                 .await
-                .map_err(|err| crate::db::Error::Sqlx(err))?;
+                .map_err(crate::db::Error::Sqlx)?;
             Ok(())
         })
     }

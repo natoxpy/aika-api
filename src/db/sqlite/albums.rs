@@ -23,7 +23,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for AlbumTable {
                 .bind(id.to_string())
                 .fetch_one(&pool)
                 .await
-                .map_err(|err| crate::db::Error::Sqlx(err))
+                .map_err(crate::db::Error::Sqlx)
         })
     }
 
@@ -39,7 +39,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for AlbumTable {
                 .bind(id.to_string())
                 .fetch_all(&pool)
                 .await
-                .map_err(|err| crate::db::Error::Sqlx(err))
+                .map_err(crate::db::Error::Sqlx)
         })
     }
 
@@ -53,7 +53,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for AlbumTable {
             sqlx::query_as::<Self::Database, Self::Item>(query)
                 .fetch_all(&pool)
                 .await
-                .map_err(|err| crate::db::Error::Sqlx(err))
+                .map_err(crate::db::Error::Sqlx)
         })
     }
 
@@ -72,7 +72,7 @@ impl<Q: ToString + Send + 'static> Table<Q> for AlbumTable {
                 // TODO!() implemente release date
                 .execute(&pool)
                 .await
-                .map_err(|err| crate::db::Error::Sqlx(err))?;
+                .map_err(crate::db::Error::Sqlx)?;
             Ok(())
         })
     }

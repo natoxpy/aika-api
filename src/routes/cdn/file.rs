@@ -16,17 +16,17 @@ async fn file_cdn(
         .files()
         .get(file_id.clone())
         .await
-        .map_err(|err| crate::routes::Error::DB(err))?;
+        .map_err(crate::routes::Error::DB)?;
 
     let path = PathBuf::from(format!("{}{}", FILES, file_record.location));
-    let file = fs::read(path).map_err(|err| crate::routes::Error::IO(err))?;
+    let file = fs::read(path).map_err(crate::routes::Error::IO)?;
 
     let mut response = HttpResponse::Ok();
 
     let mime = file_record
         .mime
         .parse::<mime::Mime>()
-        .map_err(|err| crate::routes::Error::FromStr(err))?;
+        .map_err(crate::routes::Error::FromStr)?;
 
     response.insert_header(("Content-Type", mime.to_string()));
     response.insert_header(header::ContentLength(file.len()));

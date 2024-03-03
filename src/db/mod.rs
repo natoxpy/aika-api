@@ -88,31 +88,22 @@ pub trait Tables {
     fn refs(&self) -> Box<&dyn RefTables<Database = Self::Database>>;
 }
 
+pub type TableGetReturn<Item> =
+    Pin<Box<dyn Future<Output = Result<Item, crate::db::Error>> + Send>>;
+
+pub type TableSaveReturn = Pin<Box<dyn Future<Output = Result<(), crate::db::Error>> + Send>>;
+
 /// Table which implements all generic fetching methods using the ID and generic save methods
 pub trait Table<Q: ToString + Send + 'static = String> {
     type Item;
     type Database: sqlx::Database;
 
-    fn get(
-        &self,
-        id: Q,
-    ) -> Pin<Box<dyn Future<Output = Result<Self::Item, crate::db::Error>> + Send>>;
+    fn get(&self, id: Q) -> TableGetReturn<Self::Item>;
+    fn get_many(&self, id: Q) -> TableGetReturn<Vec<Self::Item>>;
+    fn get_all(&self) -> TableGetReturn<Vec<Self::Item>>;
 
-    fn get_many(
-        &self,
-        id: Q,
-    ) -> Pin<Box<dyn Future<Output = Result<Vec<Self::Item>, error::Error>> + Send>>;
-
-    fn get_all(
-        &self,
-    ) -> Pin<Box<dyn Future<Output = Result<Vec<Self::Item>, error::Error>> + Send>>;
-
-    fn save(&self, item: Self::Item) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>>;
-
-    fn save_many(
-        &self,
-        items: Vec<Self::Item>,
-    ) -> Pin<Box<dyn Future<Output = Result<(), Error>> + Send>>;
+    fn save(&self, item: Self::Item) -> TableSaveReturn;
+    fn save_many(&self, items: Vec<Self::Item>) -> TableSaveReturn;
 }
 
 macro_rules! TableSearchFor {

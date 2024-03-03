@@ -39,7 +39,7 @@ async fn import(
         .musics()
         .save(music.clone())
         .await
-        .map_err(|err| routes::Error::DB(err))?;
+        .map_err(routes::Error::DB)?;
 
     let (track, client_id) = get_track_with_client_id(data.soundcloud_url.clone()).await?;
 
@@ -57,7 +57,7 @@ async fn import(
         .ok_or(routes::Error::Other(String::from("no media url")))?
         .get_url(client_id)
         .await
-        .map_err(|err| routes::Error::Scloud(err))?;
+        .map_err(routes::Error::Scloud)?;
 
     let uploaded_file = upload_from_bytes(get_bytes_from_url(media).await?).await?;
 
@@ -76,26 +76,26 @@ async fn import(
         .files()
         .save(uploaded_file)
         .await
-        .map_err(|err| routes::Error::DB(err))?;
+        .map_err(routes::Error::DB)?;
 
     db.tables
         .audios()
         .save(audio_record)
         .await
-        .map_err(|err| routes::Error::DB(err))?;
+        .map_err(routes::Error::DB)?;
 
     db.tables
         .refs()
         .music_audio()
         .save(music_audio_ref)
         .await
-        .map_err(|err| routes::Error::DB(err))?;
+        .map_err(routes::Error::DB)?;
 
     for artist in data.artists_id.iter() {
         let music_artist = MusicArtistRef {
             id: Uuid::new_v4(),
             music: music.id,
-            artist: artist.clone(),
+            artist: artist.to_owned(),
         };
 
         db.tables
@@ -103,14 +103,14 @@ async fn import(
             .music_artist()
             .save(music_artist)
             .await
-            .map_err(|err| routes::Error::DB(err))?;
+            .map_err(routes::Error::DB)?;
     }
 
     for featured_artist in data.featured_artists_id.iter() {
         let music_artist = MusicArtistRef {
             id: Uuid::new_v4(),
             music: music.id,
-            artist: featured_artist.clone(),
+            artist: featured_artist.to_owned(),
         };
 
         db.tables
@@ -118,14 +118,14 @@ async fn import(
             .music_artist()
             .save(music_artist)
             .await
-            .map_err(|err| routes::Error::DB(err))?;
+            .map_err(routes::Error::DB)?;
     }
 
     for album in data.albums_id.iter() {
         let music_album = MusicAlbumRef {
             id: Uuid::new_v4(),
             music: music.id,
-            album: album.clone(),
+            album: album.to_owned(),
         };
 
         db.tables
@@ -133,7 +133,7 @@ async fn import(
             .music_album()
             .save(music_album)
             .await
-            .map_err(|err| routes::Error::DB(err))?;
+            .map_err(routes::Error::DB)?;
     }
 
     let music_cover = MusicImageRef {
@@ -147,7 +147,7 @@ async fn import(
         .music_image()
         .save(music_cover)
         .await
-        .map_err(|err| routes::Error::DB(err))?;
+        .map_err(routes::Error::DB)?;
 
     Ok(HttpResponse::Ok().json(music))
 }

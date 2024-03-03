@@ -11,12 +11,12 @@ use crate::states::{DB, FILES};
 pub async fn get_bytes_from_url(file_url: String) -> Result<Vec<u8>, crate::routes::Error> {
     let response = reqwest::get(file_url)
         .await
-        .map_err(|err| routes::Error::Reqwest(err))?;
+        .map_err(routes::Error::Reqwest)?;
 
     response
         .bytes()
         .await
-        .map_err(|err| routes::Error::Reqwest(err))
+        .map_err(routes::Error::Reqwest)
         .map(|val| val.to_vec())
 }
 
@@ -25,13 +25,12 @@ pub async fn upload_from_bytes(bytes: Vec<u8>) -> Result<File, routes::Error> {
     let id = Uuid::new_v4();
 
     let location = "/";
-    let file_name = format!("{}.{}", id.to_string(), mime.extension());
+    let file_name = format!("{}.{}", id, mime.extension());
 
     let path = PathBuf::from(format!("{}{}{}", FILES, location, file_name));
-    let mut file = fs::File::create(path).map_err(|err| routes::Error::IO(err))?;
+    let mut file = fs::File::create(path).map_err(routes::Error::IO)?;
 
-    file.write_all(&bytes)
-        .map_err(|err| routes::Error::IO(err))?;
+    file.write_all(&bytes).map_err(routes::Error::IO)?;
 
     Ok(content::File {
         id,
@@ -52,7 +51,7 @@ async fn upload_from_buffer(
         .files()
         .save(file.clone())
         .await
-        .map_err(|err| routes::Error::DB(err))?;
+        .map_err(routes::Error::DB)?;
 
     Ok(HttpResponse::Ok().json(&file))
 }
@@ -68,7 +67,7 @@ async fn upload_from_url(
         .files()
         .save(file_record.clone())
         .await
-        .map_err(|err| routes::Error::DB(err))?;
+        .map_err(routes::Error::DB)?;
 
     Ok(HttpResponse::Ok().json(file_record))
 }

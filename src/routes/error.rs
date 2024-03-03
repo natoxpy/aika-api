@@ -38,7 +38,7 @@ impl ResponseError for Error {
     }
 
     fn status_code(&self) -> reqwest::StatusCode {
-        let status_code = match self {
+        match self {
             Error::DB(error) => match error {
                 crate::db::Error::Sqlx(sqlx_error) => match sqlx_error {
                     sqlx::Error::Configuration(_) => todo!(),
@@ -70,7 +70,6 @@ impl ResponseError for Error {
             Error::Other(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Error::Scloud(_) => StatusCode::INTERNAL_SERVER_ERROR,
             Error::ParseUrl(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        };
-        status_code
+        }
     }
 }
