@@ -134,17 +134,7 @@ impl<Q: ToString + Send + 'static> TableFetchWhereMusic<Q> for MusicArtistTable 
         &self,
         music: Music,
     ) -> Pin<Box<dyn Future<Output = Result<Self::ItemWhereMusic, crate::db::Error>> + Send>> {
-        let pool = self.pool.clone();
-        let query = "SELECT * FROM music_artists where music = $1;";
-        let music_id = music.id.to_string();
-
-        Box::pin(async move {
-            sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereMusic>(query)
-                .bind(music_id)
-                .fetch_one(&pool)
-                .await
-                .map_err(crate::db::Error::Sqlx)
-        })
+        self.get_where_music_id(music.id)
     }
 
     fn get_where_music_id(
@@ -158,6 +148,31 @@ impl<Q: ToString + Send + 'static> TableFetchWhereMusic<Q> for MusicArtistTable 
             sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereMusic>(query)
                 .bind(id.to_string())
                 .fetch_one(&pool)
+                .await
+                .map_err(crate::db::Error::Sqlx)
+        })
+    }
+
+    fn get_all_where_music(
+        &self,
+        music: Music,
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<Self::ItemWhereMusic>, crate::db::Error>> + Send>>
+    {
+        self.get_all_where_music_id(music.id)
+    }
+
+    fn get_all_where_music_id(
+        &self,
+        id: Q,
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<Self::ItemWhereMusic>, crate::db::Error>> + Send>>
+    {
+        let pool = self.pool.clone();
+        let query = "SELECT * FROM music_artists where music = $1;";
+
+        Box::pin(async move {
+            sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereMusic>(query)
+                .bind(id.to_string())
+                .fetch_all(&pool)
                 .await
                 .map_err(crate::db::Error::Sqlx)
         })

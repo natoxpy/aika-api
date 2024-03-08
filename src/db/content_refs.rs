@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use sqlx::{ColumnIndex, Row};
 use uuid::Uuid;
 
@@ -8,14 +9,14 @@ pub struct AlbumArtistRef {
     pub album: Uuid,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct MusicAlbumRef {
     pub id: Uuid,
     pub music: Uuid,
     pub album: Uuid,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Deserialize, Serialize, Debug, Clone)]
 pub struct MusicArtistRef {
     pub id: Uuid,
     pub music: Uuid,

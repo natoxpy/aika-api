@@ -133,17 +133,7 @@ impl<Q: ToString + Send + 'static> TableFetchWhereMusic<Q> for MusicImageTable {
         &self,
         music: Music,
     ) -> Pin<Box<dyn Future<Output = Result<Self::ItemWhereMusic, crate::db::Error>> + Send>> {
-        let pool = self.pool.clone();
-        let query = "SELECT * FROM music_images WHERE music = $1;";
-        let music_id = music.id.to_string();
-
-        Box::pin(async move {
-            sqlx::query_as::<sqlx::Sqlite, Self::ItemWhereMusic>(query)
-                .bind(music_id)
-                .fetch_one(&pool)
-                .await
-                .map_err(crate::db::Error::Sqlx)
-        })
+        self.get_where_music_id(music.id)
     }
 
     fn get_where_music_id(

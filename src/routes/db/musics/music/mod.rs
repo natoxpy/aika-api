@@ -2,6 +2,7 @@ use actix_web::{get, web, HttpResponse, Responder, Scope};
 
 use crate::states::DB;
 
+pub mod artists;
 pub mod audio;
 pub mod cover;
 
@@ -20,5 +21,6 @@ pub fn scope() -> Scope {
     web::scope("/{music_id}")
         .service(cover::get_cover)
         .service(audio::get_audio)
+        .service(artists::get_artists)
         .service(get_music)
 }

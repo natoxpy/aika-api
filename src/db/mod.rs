@@ -112,7 +112,49 @@ macro_rules! TableSearchFor {
             pub trait [<TableFetchWhere $a>]<Q: ToString + Send + 'static = String> {
                 type [<Item Where $a>];
                 fn [<get_where_ $a:lower>](&self, [<$a:lower>]: $a) -> Pin<Box<dyn Future<Output = Result<Self::[<Item Where $a>], crate::db::Error>> + Send>>;
+
+                #[allow(unused_variables)]
+                fn [<get_all_where_ $a:lower>](&self, [<$a:lower>]: $a) -> Pin<Box<dyn Future<Output = Result<Vec<Self::[<Item Where $a>]>, crate::db::Error>> + Send>> { todo!() }
+
                 fn [<get_where_ $a:lower _id>](&self, id: Q) -> Pin<Box<dyn Future<Output = Result<Self::[<Item Where $a>], crate::db::Error>> + Send>>;
+
+                #[allow(unused_variables)]
+                fn [<get_all_where_ $a:lower _id>](&self, id: Q) -> Pin<Box<dyn Future<Output = Result<Vec<Self::[<Item Where $a>]>, crate::db::Error>> + Send>> { todo!() }
+            }
+        }
+    };
+}
+
+macro_rules! TableSearchForJoin {
+    ($a:ident, $b:ident) => {
+        paste! {
+            pub trait [<TableFetchWhereJoin $a>]<Q: ToString + Send + 'static = String> {
+                type [<Item Where $a>];
+
+
+                #[allow(unused_variables)]
+                fn [<get_where_ $a:lower>, and_or_, $b:lower](&self, [<$a:lower>]: $a, [<$b:lower>: $b]) -> Pin<Box<dyn Future<Output = Result<Self::[<Item Where $a>], crate::db::Error>> + Send>> { todo!() }
+
+                #[allow(unused_variables)]
+                fn [<get_where_ $a:lower>, and, $b:lower](&self, [<$a:lower>]: $a, [<$b:lower>: $b]) -> Pin<Box<dyn Future<Output = Result<Self::[<Item Where $a>], crate::db::Error>> + Send>> { todo!() }
+            }
+        }
+    };
+}
+
+macro_rules! TableSearchForAllJoin {
+    ($a:ident, $b:ident) => {
+        paste! {
+            pub trait [<TableFetchWhereJoin $a>]<Q: ToString + Send + 'static = String> {
+                type [<Item Where $a>];
+
+
+                #[allow(unused_variables)]
+                fn [<get_all_where_ $a:lower>, and_or_, $b:lower](&self, [<$a:lower>]: $a, [<$b:lower>: $b]) -> Pin<Box<dyn Future<Output = Result<Self::[<Item Where $a>], crate::db::Error>> + Send>> { todo!() }
+
+                #[allow(unused_variables)]
+                fn [<get_all_where_ $a:lower>, and, $b:lower](&self, [<$a:lower>]: $a, [<$b:lower>: $b]) -> Pin<Box<dyn Future<Output = Result<Self::[<Item Where $a>], crate::db::Error>> + Send>> { todo!() }
+
             }
         }
     };

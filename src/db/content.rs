@@ -23,6 +23,14 @@ pub struct Artist {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ArtistFeaturedMark {
+    pub id: Uuid,
+    pub name: String,
+    pub avatar: Option<String>,
+    pub featured: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Album {
     pub id: Uuid,
     pub name: String,
@@ -102,6 +110,29 @@ where
         })
     }
 }
+
+// impl<'r, R> sqlx::FromRow<'r, R> for ArtistFeaturedMark
+// where
+//     R: Row,
+//     &'r str: ColumnIndex<R>,
+//     String: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
+//     i64: sqlx::decode::Decode<'r, R::Database> + sqlx::types::Type<R::Database>,
+// {
+//     #[inline]
+//     fn from_row(row: &'r R) -> Result<Self, sqlx::Error> {
+//         let id: String = row.try_get("id")?;
+//         let name: String = row.try_get("name")?;
+//         let avatar: Option<String> = row.try_get("avatar")?;
+//         let featured: i32 = row.try_get("featured")?;
+//
+//         Ok(Self {
+//             id: Uuid::parse_str(&id).unwrap(),
+//             name,
+//             avatar,
+//             featured: featured == 1,
+//         })
+//     }
+// }
 
 impl<'r, R> sqlx::FromRow<'r, R> for Audio
 where
