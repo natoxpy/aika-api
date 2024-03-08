@@ -1840,7 +1840,7 @@ dependencies = [
 [[package]]
 name = "sclouddl"
 version = "0.1.0"
-source = "git+https://github.com/natoxpy/sclouddl.git#f31a534aa72b0171d91b349bb0b8c5914895eae4"
+source = "git+https://github.com/natoxpy/sclouddl.git?branch=main#ff85cf7de0b2989c5904bd15d42e3f037969e611"
 dependencies = [
  "regex",
  "reqwest",
