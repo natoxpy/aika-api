@@ -24,7 +24,7 @@ async fn main() -> std::io::Result<()> {
     env::set_var("RUST_BACKTRACE", "1");
 
     sqlpath.push(FILES);
-    sqlpath.push("music.db");
+    sqlpath.push("core.db");
 
     let pool = SqlitePoolOptions::new()
         .max_connections(10)
